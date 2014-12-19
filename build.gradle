@@ -1,4 +1,28 @@
-subprojects
+configure(subprojects) 
 {
-
+	def n = it.path
+	if (n ==~ ':(app|mod|coremod):(client|common|server)')
+	{		
+		apply plugin: 'java'
+		apply plugin: 'eclipse'
+		
+		def pn = n.substring(1,n.lastIndexOf(':'))
+		def pt = n.substring(n.lastIndexOf(':') + 1)
+		
+		eclipse 
+		{
+			project 
+			{
+				name = pn + "." + pt
+			}
+		}
+		
+		if (n ==~ '.*:client' || n ==~ '.*:server') 
+		{
+			dependencies 
+			{
+				compile project(":" + pn + ":common")
+			}
+		}
+	}
 }
