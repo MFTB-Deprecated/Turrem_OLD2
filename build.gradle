@@ -6,22 +6,48 @@ configure(subprojects)
 		apply plugin: 'java'
 		apply plugin: 'eclipse'
 		
-		def pn = n.substring(1,n.lastIndexOf(':'))
-		def pt = n.substring(n.lastIndexOf(':') + 1)
+		def partname = n.substring(1,n.lastIndexOf(':'))
+		def sidename = n.substring(n.lastIndexOf(':') + 1)
 		
 		eclipse 
 		{
 			project 
 			{
-				name = pn + "." + pt
+				name = partname + "." + sidename
 			}
 		}
 		
-		if (n ==~ '.*:client' || n ==~ '.*:server') 
+		if (sidename != "common") 
 		{
 			dependencies 
 			{
-				compile project(":" + pn + ":common")
+				compile project(":" + partname + ":common")
+			}
+		}
+		
+		if (partname == 'mod')
+		{
+			dependencies 
+			{
+				compile project(":coremod:" + sidename)
+				compile project(":app:" + sidename)
+				if (sidename != "common") 
+				{
+					compile project(":coremod:common")
+					compile project(":app:common")
+				}
+			}
+		}
+		
+		if (partname == 'coremod')
+		{
+			dependencies 
+			{
+				compile project(":app:" + sidename)
+				if (sidename != "common") 
+				{
+					compile project(":app:common")
+				}
 			}
 		}
 	}
