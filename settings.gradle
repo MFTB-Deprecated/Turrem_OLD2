@@ -1,0 +1,3 @@
+include "app:client", "app:server", "app:common", "app"
+include "coremod:client", "coremod:server", "coremod:common", "coremod"
+include "mod:client", "mod:server", "mod:common", "mod"
