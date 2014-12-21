@@ -1,7 +1,16 @@
 configure(subprojects) 
 {
 	def n = it.path
-	if (n ==~ ':(app|mod|coremod):(client|common|server)')
+	def useGuava = false;
+	def useArgo = false;
+	if (n == ':utils')
+	{
+		apply plugin: 'java'
+		apply plugin: 'eclipse'
+		useGuava = true;
+		useArgo = true;
+	}
+	else if (n ==~ ':(app|mod|coremod):(client|common|server)')
 	{		
 		apply plugin: 'java'
 		apply plugin: 'eclipse'
@@ -9,6 +18,25 @@ configure(subprojects)
 		def partname = n.substring(1,n.lastIndexOf(':'))
 		def sidename = n.substring(n.lastIndexOf(':') + 1)
 		
+		def isApp = partname == 'app'
+		def isMod = partname == 'mod'
+		def isCoremod = partname == 'coremod'
+		
+		def isClient = sidename == 'client'
+		def isCommon = sidename == 'common'
+		def isServer = sidename == 'server'
+
+		if (isApp)
+		{
+			useGuava = true;
+			useArgo = true;
+			
+			dependencies 
+			{
+				compile project(":utils")
+			}
+		}
+
 		eclipse 
 		{
 			project 
@@ -17,7 +45,7 @@ configure(subprojects)
 			}
 		}
 		
-		if (sidename != "common") 
+		if (!isCommon) 
 		{
 			dependencies 
 			{
@@ -25,13 +53,13 @@ configure(subprojects)
 			}
 		}
 		
-		if (partname == 'mod')
+		if (isMod)
 		{
 			dependencies 
 			{
 				compile project(":coremod:" + sidename)
 				compile project(":app:" + sidename)
-				if (sidename != "common") 
+				if (!isCommon) 
 				{
 					compile project(":coremod:common")
 					compile project(":app:common")
@@ -39,16 +67,38 @@ configure(subprojects)
 			}
 		}
 		
-		if (partname == 'coremod')
+		if (isCoremod)
 		{
 			dependencies 
 			{
 				compile project(":app:" + sidename)
-				if (sidename != "common") 
+				if (!isCommon) 
 				{
 					compile project(":app:common")
 				}
 			}
+		}
+	}
+	if (useGuava || useArgo)
+	{
+		repositories 
+		{
+			mavenCentral()
+		}
+
+	}
+	if (useGuava)
+	{
+		dependencies 
+		{
+			compile group: 'com.google.guava', name: 'guava', version: '12.0'
+		}
+	}
+	if (useArgo)
+	{
+		dependencies 
+		{
+			compile group: 'net.sourceforge.argo', name: 'argo', version: '3.12'
 		}
 	}
 }
