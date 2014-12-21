@@ -28,7 +28,7 @@ public abstract class ClassWithFactoryRegistry extends ClassRegistry
 		boolean flag = false;
 		for (Method met : clas.getMethods())
 		{
-			if (met.isAnnotationPresent(ElementToRegisterFactory.class))
+			if (met.isAnnotationPresent(InstancesToRegister.class))
 			{
 				try
 				{
@@ -37,14 +37,14 @@ public abstract class ClassWithFactoryRegistry extends ClassRegistry
 				}
 				catch (Exception e)
 				{
-					System.out.printf("Method %s.%s has @%s, but threw %s when invoked.%n", met.getDeclaringClass().getName(), met.getName(), ElementToRegisterFactory.class.getSimpleName(), e.getClass().getSimpleName());
+					System.out.printf("Method %s.%s has @%s, but threw %s when invoked.%n", met.getDeclaringClass().getName(), met.getName(), InstancesToRegister.class.getSimpleName(), e.getClass().getSimpleName());
 					e.printStackTrace();
 				}
 			}
 		}
 		if (!flag)
 		{
-			System.out.printf("Class %s extends %s and is registered, but does not contain a method with @%s.%n", clas.getName(), this.tagetClass.getName(), ElementToRegisterFactory.class.getSimpleName());
+			System.out.printf("Class %s extends %s and is registered, but does not contain a method with @%s.%n", clas.getName(), this.tagetClass.getName(), InstancesToRegister.class.getSimpleName());
 		}
 	}
 	
@@ -52,13 +52,13 @@ public abstract class ClassWithFactoryRegistry extends ClassRegistry
 	{
 		if (!Modifier.isStatic(met.getModifiers()))
 		{
-			System.out.printf("Method %s.%s has @%s, but is not static.%n", met.getDeclaringClass().getName(), met.getName(), ElementToRegisterFactory.class.getSimpleName());
+			System.out.printf("Method %s.%s has @%s, but is not static.%n", met.getDeclaringClass().getName(), met.getName(), InstancesToRegister.class.getSimpleName());
 			return;
 		}
 		Class<?> ret = met.getReturnType();
 		if (!ReflectionUtils.isClassNumberofClass(ret, this.tagetClass, true))
 		{
-			System.out.printf("Method %s.%s has @%s, but does not return the correct type.%n", met.getDeclaringClass().getName(), met.getName(), ElementToRegisterFactory.class.getSimpleName());
+			System.out.printf("Method %s.%s has @%s, but does not return the correct type.%n", met.getDeclaringClass().getName(), met.getName(), InstancesToRegister.class.getSimpleName());
 			return;
 		}
 		for (int i = 0; i < this.possible.size(); i++)
@@ -74,7 +74,7 @@ public abstract class ClassWithFactoryRegistry extends ClassRegistry
 				return;
 			}
 		}
-		System.out.printf("Method %s.%s has @%s, but requires invalid parameters.%n", met.getDeclaringClass().getName(), met.getName(), ElementToRegisterFactory.class.getSimpleName());
+		System.out.printf("Method %s.%s has @%s, but requires invalid parameters.%n", met.getDeclaringClass().getName(), met.getName(), InstancesToRegister.class.getSimpleName());
 	}
 	
 	protected abstract Object[] getArgs(int argsType, Annotation annotation, ModInstance mod);
