@@ -1,6 +1,6 @@
 package net.turrem.app.client.render.object;
 
-import net.turrem.app.client.Config;
+import net.turrem.app.client.ClientConfig;
 import net.turrem.app.client.render.RenderEngine;
 
 public class RenderObjectTVF implements IRenderObject
@@ -39,7 +39,7 @@ public class RenderObjectTVF implements IRenderObject
 		{
 			return false;
 		}
-		this.tvf = render.loadTVFRender(this.source, this.scale, Config.doAO);
+		this.tvf = render.loadTVFRender(this.source, this.scale, ClientConfig.doAO);
 		return true;
 	}
 	
@@ -47,7 +47,7 @@ public class RenderObjectTVF implements IRenderObject
 	public boolean reload(RenderEngine render)
 	{
 		this.unload(render);
-		this.tvf = render.loadTVFRender(this.source, this.scale, Config.doAO);
+		this.tvf = render.loadTVFRender(this.source, this.scale, ClientConfig.doAO);
 		return true;
 	}
 	

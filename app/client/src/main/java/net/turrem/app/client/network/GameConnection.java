@@ -2,14 +2,12 @@ package net.turrem.app.client.network;
 
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
-
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-
 import java.net.Socket;
 
-import net.turrem.app.client.Config;
+import net.turrem.app.Config;
 import net.turrem.app.client.game.world.ClientWorld;
 import net.turrem.app.client.network.client.ClientPacket;
 import net.turrem.app.client.network.client.ClientPacketKeepAlive;

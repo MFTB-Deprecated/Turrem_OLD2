@@ -1,6 +1,6 @@
 package net.turrem.app.client.network;
 
-import net.turrem.app.client.Config;
+import net.turrem.app.Config;
 
 public class ConnectionReaderThread extends Thread
 {

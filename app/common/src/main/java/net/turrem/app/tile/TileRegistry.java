@@ -1,85 +1,27 @@
 package net.turrem.app.tile;
 
-import java.lang.annotation.Annotation;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
-import net.turrem.app.EnumSide;
-import net.turrem.app.mod.ModInstance;
-import net.turrem.app.mod.registry.ClassWithFactoryRegistry;
-
-public class TileRegistry extends ClassWithFactoryRegistry
+public class TileRegistry
 {
-	private final static List<Class<?>[]> valadParameters = new ArrayList<Class<?>[]>();
+	private static HashMap<String, Tile> tiles = new HashMap<String, Tile>();
 	
-	public HashMap<String, BasicTile> tiles = new HashMap<String, BasicTile>();
-	public HashMap<String, DynamicTile> dynamicTiles = new HashMap<String, DynamicTile>();
-	
-	public final EnumSide side;
-	
-	public TileRegistry(EnumSide side)
+	public static Tile getTile(String id)
 	{
-		super(Tile.class);
-		this.side = side;
+		return tiles.get(id);
 	}
 	
-	@Override
-	protected List<Class<?>[]> getPossibleFactoryParameters()
+	public static void register(Tile tile)
 	{
-		return TileRegistry.valadParameters;
-	}
-	
-	@Override
-	protected Object[] getArgs(int argsType, Annotation annotation, ModInstance mod)
-	{
-		RegisterTile reg = (RegisterTile) annotation;
-		switch (argsType)
+		if (tile instanceof BasicTile || tile instanceof DynamicTile)
 		{
-			case 0:
-				return new Object[] {};
-			case 1:
-				return new Object[] { this.side };
-			case 2:
-				return new Object[] { this.side, reg.id() };
-			case 3:
-				return new Object[] { reg.id() };
-			default:
-				return new Object[] {};
-		}
-	}
-	
-	@Override
-	protected void addItem(Object item, ModInstance mod)
-	{
-		Tile tile = (Tile) item;
-		tile.mod = mod;
-		tile.side = this.side;
-		if (tile instanceof BasicTile)
-		{
-			if (this.tiles.put(tile.getId(), (BasicTile) tile) != null)
+			String id = tile.getId();
+			if (tiles.containsKey(id))
 			{
-				System.out.printf("A basic tile id %s was already registered, it will be overridden.%n", tile.getId());
+				System.out.printf("A tile with id %s already exists, it will be overridden!");
 			}
+			tiles.put(id, tile);
 		}
-		else if (tile instanceof DynamicTile)
-		{
-			if (this.dynamicTiles.put(tile.getId(), (DynamicTile) tile) != null)
-			{
-				System.out.printf("A dynamic tile with id %s was already registered, it will be overridden.%n", tile.getId());
-			}
-		}
-		else
-		{
-			System.out.printf("A tile with id %s did not extend BasicTile or DynamicTile.%n", tile.getId());
-		}
-	}
-	
-	static
-	{
-		TileRegistry.valadParameters.add(new Class<?>[] {});
-		TileRegistry.valadParameters.add(new Class<?>[] { EnumSide.class });
-		TileRegistry.valadParameters.add(new Class<?>[] { EnumSide.class, String.class });
-		TileRegistry.valadParameters.add(new Class<?>[] { String.class });
+		System.out.printf("Failed to register a tile (id: %s) because it did not extend BasicTile or DynamicTile.%n", tile.getId());
 	}
 }

@@ -1,9 +1,5 @@
 package net.turrem.app.mod;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.jar.JarFile;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -12,6 +8,10 @@ import java.lang.reflect.Modifier;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.jar.JarFile;
 
 import net.turrem.app.EnumSide;
 import net.turrem.app.mod.event.OnLoad;
@@ -19,12 +19,11 @@ import net.turrem.app.mod.event.OnPostLoad;
 import net.turrem.app.mod.event.OnPreLoad;
 import net.turrem.app.mod.event.PreRegister;
 import net.turrem.utils.JarExplore;
+import argo.saj.InvalidSyntaxException;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.io.Files;
-
-import argo.saj.InvalidSyntaxException;
 
 public class ModLoader
 {
@@ -119,7 +118,7 @@ public class ModLoader
 		this.modClassLoader = URLClassLoader.newInstance(jars, parent);
 	}
 	
-	public void loadMods(NotedElementRegistryRegistry notedElements)
+	public void loadMods()
 	{
 		ArrayListMultimap<ModInstance, Class<?>> claz = ArrayListMultimap.create();
 		for (ModInstance mod : this.mods.values())
@@ -133,8 +132,8 @@ public class ModLoader
 				System.out.printf("Failed to get class list for [%s].%n", mod.identifier);
 			}
 		}
-		this.onPreVisitLoad(notedElements, claz);
-		this.onLoad(notedElements, claz);
+		this.onPreVisitLoad(claz);
+		this.onLoad(claz);
 		this.onPostLoad(claz);
 	}
 	
@@ -169,14 +168,13 @@ public class ModLoader
 		return this.getModJarFile(mod.identifier);
 	}
 	
-	protected void onLoad(NotedElementRegistryRegistry registry, ArrayListMultimap<ModInstance, Class<?>> map)
+	protected void onLoad(ArrayListMultimap<ModInstance, Class<?>> map)
 	{
 		for (ModInstance mod : map.keySet())
 		{
 			List<Class<?>> claz = map.get(mod);
 			for (Class<?> clas : claz)
 			{
-				registry.visitClass(clas, mod);
 				for (Method met : clas.getDeclaredMethods())
 				{
 					if (met.isAnnotationPresent(OnLoad.class))
@@ -252,7 +250,7 @@ public class ModLoader
 		}
 	}
 	
-	protected void onPreVisitLoad(NotedElementRegistryRegistry registry, ArrayListMultimap<ModInstance, Class<?>> map)
+	protected void onPreVisitLoad(ArrayListMultimap<ModInstance, Class<?>> map)
 	{
 		for (ModInstance mod : map.keySet())
 		{
@@ -264,6 +262,7 @@ public class ModLoader
 					String name = met.getName();
 					if (met.isAnnotationPresent(PreRegister.class))
 					{
+						/*
 						if (!Modifier.isStatic(met.getModifiers()))
 						{
 							System.out.printf("Method %s has @PreRegister, but is not static.%n", name);
@@ -291,6 +290,7 @@ public class ModLoader
 								ex.printStackTrace();
 							}
 						}
+						*/
 					}
 					if (met.isAnnotationPresent(OnPreLoad.class))
 					{

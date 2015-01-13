@@ -2,20 +2,14 @@ package net.turrem.app.client.game.world;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
-
 import java.net.Socket;
 
-import net.turrem.app.client.Config;
+import net.turrem.app.Config;
+import net.turrem.app.client.ClientConfig;
 import net.turrem.app.client.game.ClientGame;
 import net.turrem.app.client.game.PlayerFace;
-import net.turrem.app.client.game.world.material.MaterialList;
-import net.turrem.app.client.game.world.storage.ChunkStorage;
 import net.turrem.app.client.network.GameConnection;
-import net.turrem.app.client.network.client.request.RequestChunk;
 import net.turrem.app.client.network.server.ServerPacket;
-import net.turrem.app.client.network.server.ServerPacketMaterialSync;
-import net.turrem.app.client.network.server.ServerPacketStartingInfo;
-import net.turrem.app.client.network.server.ServerPacketTerrain;
 import net.turrem.app.client.render.RenderEngine;
 import net.turrem.utils.geo.Point;
 
@@ -47,7 +41,7 @@ public class ClientWorld
 			int px = (int) foc.xCoord;
 			int pz = (int) foc.zCoord;
 			Chunk.chunkRenders = 0;
-			this.chunks.renderTick(px, pz, Config.chunkRenderRadius, Config.chunkRenderRadiusPrecise);
+			this.chunks.renderTick(px, pz, ClientConfig.chunkRenderRadius, ClientConfig.chunkRenderRadiusPrecise);
 			this.chunkrends += Chunk.chunkRenders;
 			if (this.worldTime % 200 == 0)
 			{
@@ -81,7 +75,7 @@ public class ClientWorld
 	
 	public int getHeight(int x, int z, int empty)
 	{
-		Chunk c = this.getChunk(x >> 4, z >> 4);
+		Chunk c = this.getChunk(x >> Config.chunkBitSize, z >> Config.chunkBitSize);
 		if (c == null)
 		{
 			return empty;
@@ -126,14 +120,14 @@ public class ClientWorld
 	
 	public int requestNullChunks(int centerx, int centerz, int select, int num)
 	{
-		if (!Config.shouldRequestChunks)
+		if (!ClientConfig.shouldRequestChunks)
 		{
 			return 0;
 		}
-		int chunkx = centerx >> 4;
-		int chunkz = centerz >> 4;
+		int chunkx = centerx >> Config.chunkBitSize;
+		int chunkz = centerz >> Config.chunkBitSize;
 		int ind = 0;
-		for (int dist = 1; dist <= Config.chunkRequestDistance * 2; dist += 2)
+		for (int dist = 1; dist <= ClientConfig.chunkRequestDistance * 2; dist += 2)
 		{
 			int hal = dist / 2;
 			

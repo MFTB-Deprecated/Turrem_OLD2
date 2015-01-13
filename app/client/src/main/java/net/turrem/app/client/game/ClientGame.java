@@ -1,10 +1,9 @@
 package net.turrem.app.client.game;
 
 import java.io.IOException;
-
 import java.nio.FloatBuffer;
 
-import net.turrem.app.client.Config;
+import net.turrem.app.Config;
 import net.turrem.app.client.Turrem;
 import net.turrem.app.client.game.world.ClientWorld;
 import net.turrem.app.client.render.RenderEngine;

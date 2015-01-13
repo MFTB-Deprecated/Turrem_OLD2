@@ -1,7 +1,7 @@
 package net.turrem.app.client.game;
 
-import net.turrem.app.client.Config;
-import net.turrem.app.client.game.world.Chunk;
+import net.turrem.app.Config;
+import net.turrem.app.client.ClientConfig;
 import net.turrem.app.client.game.world.ClientWorld;
 import net.turrem.utils.geo.EnumDir;
 import net.turrem.utils.geo.Point;
@@ -52,8 +52,8 @@ public class PlayerFace
 	
 	public void updatePars()
 	{
-		float width = Config.getWidth();
-		float height = Config.getHeight();
+		float width = ClientConfig.getWidth();
+		float height = ClientConfig.getHeight();
 		this.aspect = width / height;
 	}
 	
@@ -114,8 +114,8 @@ public class PlayerFace
 		v.scale(vLength);
 		h.scale(hLength);
 		
-		int width = Config.getWidth();
-		int height = Config.getHeight();
+		int width = ClientConfig.getWidth();
+		int height = ClientConfig.getHeight();
 		
 		mousex -= (width / 2.0F);
 		mousey -= (height / 2.0F);
@@ -306,7 +306,7 @@ public class PlayerFace
 	
 	private boolean testPickTerrain(int x, int y, int z, EnumDir face, ClientWorld world)
 	{
-		Chunk chunk = world.getChunk(x >> 4, z >> 4);
+		Chunk chunk = world.getChunk(x >> Config.chunkBitSize, z >> Config.chunkBitSize);
 		if (chunk == null)
 		{
 			return false;
@@ -322,11 +322,11 @@ public class PlayerFace
 	public void tickCamera(ClientWorld world)
 	{
 		long currentTime = System.currentTimeMillis();
-		if (currentTime - this.lastChunkRequestTime > Config.chunkRequestTimeLimit || this.lastChunkRequestTime == 0)
+		if (currentTime - this.lastChunkRequestTime > ClientConfig.chunkRequestTimeLimit || this.lastChunkRequestTime == 0)
 		{
 			int dx = this.lastChunkRequestX - (int) this.camLoc.xCoord;
 			int dz = this.lastChunkRequestZ - (int) this.camLoc.zCoord;
-			if (dx * dx + dz * dz > 256)
+			if (dx * dx + dz * dz > Config.chunkSize * Config.chunkSize)
 			{
 				this.lastChunkRequestX = (int) this.camLoc.xCoord;
 				this.lastChunkRequestZ = (int) this.camLoc.zCoord;
@@ -339,8 +339,8 @@ public class PlayerFace
 		int wm = Mouse.getDWheel();
 		if (Mouse.isButtonDown(2))
 		{
-			this.camYaw -= (Mouse.getX() - this.mouselastx) * Config.mouseSpeedX;
-			this.camPitch -= (Mouse.getY() - this.mouselasty) * Config.mouseSpeedY;
+			this.camYaw -= (Mouse.getX() - this.mouselastx) * ClientConfig.mouseSpeedX;
+			this.camPitch -= (Mouse.getY() - this.mouselasty) * ClientConfig.mouseSpeedY;
 			if (this.camPitch < 10.0F)
 			{
 				this.camPitch = 10.0F;
@@ -353,14 +353,14 @@ public class PlayerFace
 		}
 		else if (wm != 0)
 		{
-			this.camDist -= wm * Config.scrollSpeed;
-			if (this.camDist < Config.camDistMin)
+			this.camDist -= wm * ClientConfig.scrollSpeed;
+			if (this.camDist < ClientConfig.camDistMin)
 			{
-				this.camDist = Config.camDistMin;
+				this.camDist = ClientConfig.camDistMin;
 			}
-			if (this.camDist > Config.camDistMax)
+			if (this.camDist > ClientConfig.camDistMax)
 			{
-				this.camDist = Config.camDistMax;
+				this.camDist = ClientConfig.camDistMax;
 			}
 		}
 		if (Mouse.isButtonDown(0))
