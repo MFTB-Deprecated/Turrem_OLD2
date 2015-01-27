@@ -56,26 +56,19 @@ public class RenderObjectTexture implements IRenderObject
 		return this.textureId != -1;
 	}
 	
-	@Override
-	public boolean load(RenderEngine render)
+	private boolean doLoad(RenderEngine render)
 	{
-		if (this.isLoaded())
-		{
-			return false;
-		}
 		BufferedImage img = render.loadTexture(this);
 		if (img != null)
 		{
 			this.width = img.getWidth();
 			this.height = img.getHeight();
 			this.aspect = (float) this.width / (float) this.height;
-			ByteBuffer bytes = ImgUtils.imgToByteBuffer(img);
+			ByteBuffer bytes = ImgUtils.imageToBufferDefault(img);
 			
 			int texId = GL11.glGenTextures();
 			GL13.glActiveTexture(GL13.GL_TEXTURE0);
 			GL11.glBindTexture(GL11.GL_TEXTURE_2D, texId);
-			
-			GL11.glPixelStorei(GL11.GL_UNPACK_ALIGNMENT, 1);
 			
 			GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, this.width, this.height, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, bytes);
 			GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, this.glSample);
@@ -92,38 +85,23 @@ public class RenderObjectTexture implements IRenderObject
 	}
 	
 	@Override
+	public boolean load(RenderEngine render)
+	{
+		if (this.isLoaded())
+		{
+			return false;
+		}
+		return this.doLoad(render);
+	}
+	
+	@Override
 	public boolean reload(RenderEngine render)
 	{
 		if (this.isLoaded())
 		{
 			this.unload(render);
 		}
-		BufferedImage img = render.loadTexture(this);
-		if (img != null)
-		{
-			this.width = img.getWidth();
-			this.height = img.getHeight();
-			this.aspect = (float) this.width / (float) this.height;
-			ByteBuffer bytes = ImgUtils.imgToByteBuffer(img);
-			
-			int texId = GL11.glGenTextures();
-			GL13.glActiveTexture(GL13.GL_TEXTURE0);
-			GL11.glBindTexture(GL11.GL_TEXTURE_2D, texId);
-			
-			GL11.glPixelStorei(GL11.GL_UNPACK_ALIGNMENT, 1);
-			
-			GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, this.width, this.height, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, bytes);
-			GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, this.glSample);
-			GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
-			GL30.glGenerateMipmap(GL11.GL_TEXTURE_2D);
-			
-			this.textureId = texId;
-			return true;
-		}
-		else
-		{
-			return false;
-		}
+		return this.doLoad(render);
 	}
 	
 	@Override

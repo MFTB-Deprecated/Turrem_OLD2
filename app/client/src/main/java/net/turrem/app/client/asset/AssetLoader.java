@@ -1,11 +1,8 @@
 package net.turrem.app.client.asset;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-
-import java.awt.image.BufferedImage;
-
-import net.turrem.tvf.TVFFile;
 
 import javax.imageio.ImageIO;
 
@@ -35,16 +32,6 @@ public class AssetLoader
 		dir += file;
 		dir += "." + ext;
 		return new File(this.bin, dir);
-	}
-	
-	public TVFFile loadTVF(String name) throws IOException
-	{
-		File filein = this.getFile(name, "tvf");
-		if (filein.exists())
-		{
-			return TVFFile.read(filein);
-		}
-		return null;
 	}
 	
 	public BufferedImage loadTexture(String name) throws IOException
