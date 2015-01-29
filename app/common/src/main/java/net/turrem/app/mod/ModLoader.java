@@ -19,74 +19,71 @@ import net.turrem.app.mod.event.OnPostLoad;
 import net.turrem.app.mod.event.OnPreLoad;
 import net.turrem.app.mod.event.PreRegister;
 import net.turrem.utils.JarExplore;
-import argo.saj.InvalidSyntaxException;
 
-import com.google.common.base.Charsets;
 import com.google.common.collect.ArrayListMultimap;
-import com.google.common.io.Files;
 
 public class ModLoader
 {
-	private HashMap<String, ModInstance> mods = new HashMap<String, ModInstance>();
+	private static ModLoader instance;
+	private HashMap<Mod, ModInstance> mods = new HashMap<Mod, ModInstance>();
 	private final EnumSide side;
-	private final File modDirectory;
-	public URLClassLoader modClassLoader;
+	private final File modsDir;
+	private boolean loaded = false;
 	
-	public ModLoader(File modDirectory, EnumSide side)
+	public ModLoader(File modsDir, EnumSide side)
 	{
-		this.modDirectory = modDirectory;
+		this.modsDir = modsDir;
 		this.side = side;
+		instance = this;
 	}
 	
-	public ModInstance getMod(String identifier)
+	public static ModLoader instance()
 	{
-		return this.mods.get(identifier);
+		return instance;
 	}
 	
-	public void findMods()
+	public ModInstance getMod(Mod mod)
 	{
-		for (File dir : this.modDirectory.listFiles())
+		return this.mods.get(mod);
+	}
+	
+	public void buildModList()
+	{
+		if (!this.modsDir.exists())
 		{
-			if (dir.isDirectory())
+			this.modsDir.mkdir();
+			return;
+		}
+		for (File modDir : this.modsDir.listFiles())
+		{
+			Mod mod = new Mod(modDir.getName(), null);
+			ModInstance modi = new ModInstance();
+			boolean hasInfo = false;
+			boolean hasAssets = false;
+			boolean hasJar = false;
+			for (File file : modDir.listFiles())
 			{
-				File info = new File(dir, "mod.info");
-				if (info.exists())
+				String name = file.getName();
+				if (name.equals("mod.info") && file.isFile())
 				{
-					String id = dir.getName();
-					if (id.contains(":"))
-					{
-						System.out.printf("Mod IDs cannot contain any ':' characters.%n", id);
-					}
-					else
-					{
-						if (this.mods.containsKey(id))
-						{
-							System.out.printf("Mod [%s] is already registered! This is a bug!%n", id);
-							break;
-						}
-						System.out.printf("Found mod.info for [%s].%n", id);
-						ModInstance mod = null;
-						try
-						{
-							String json = Files.toString(info, Charsets.UTF_8);
-							mod = new ModInstance(json, id);
-						}
-						catch (IOException io)
-						{
-							System.out.printf("Failed to load mod.info for [%s]. An IOException occurred.%n", id);
-							io.printStackTrace();
-						}
-						catch (InvalidSyntaxException e)
-						{
-							System.out.printf("Failed to load mod.info for [%s]. File was not valid JSON.%n", id);
-							e.printStackTrace();
-						}
-						if (mod != null)
-						{
-							this.mods.put(id, mod);
-						}
-					}
+					hasInfo = true;
 				}
+				else if (name.equals("assets") && file.isDirectory())
+				{
+					hasAssets = true;
+				}
+				else if (name.equals(this.side.id + ".jar"))
+				{
+					hasJar = true;
+				}
+			}
+			if (hasJar)
+			{
+				
+			}
+			else
+			{
+				
 			}
 		}
 	}
