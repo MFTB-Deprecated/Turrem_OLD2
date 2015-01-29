@@ -2,7 +2,7 @@ configure(subprojects)
 {
 	def n = it.path
 	def useGuava = false
-	def useArgo = false
+	def useGson = false
 	def useLWJGL = false
 	def useTrove = false
 	if (n == ':utils')
@@ -10,7 +10,7 @@ configure(subprojects)
 		apply plugin: 'java'
 		apply plugin: 'eclipse'
 		useGuava = true
-		useArgo = true
+		useGson = true
 		useTrove = true
 	}
 	else if (n ==~ ':(app|mod|coremod):(client|common|server)')
@@ -32,7 +32,7 @@ configure(subprojects)
 		if (isApp)
 		{
 			useGuava = true
-			useArgo = true
+			useGson = true
 			useTrove = true
 			
 			dependencies 
@@ -88,7 +88,7 @@ configure(subprojects)
 			}
 		}
 	}
-	if (useGuava || useArgo || useLWJGL || useTrove)
+	if (useGuava || useGson || useLWJGL || useTrove)
 	{
 		repositories 
 		{
@@ -102,11 +102,11 @@ configure(subprojects)
 			compile group: 'com.google.guava', name: 'guava', version: '18.0'
 		}
 	}
-	if (useArgo)
+	if (useGson)
 	{
 		dependencies 
 		{
-			compile group: 'net.sourceforge.argo', name: 'argo', version: '3.12'
+			compile group: 'com.google.code.gson', name: 'gson', version: '2.3'
 		}
 	}
 	if (useLWJGL)

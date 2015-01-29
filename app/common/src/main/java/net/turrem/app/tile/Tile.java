@@ -1,12 +1,12 @@
 package net.turrem.app.tile;
 
-import net.turrem.app.IdentifiableModFeature;
-import net.turrem.app.mod.ModInstance;
+import net.turrem.app.IdentifiableFeature;
+import net.turrem.app.mod.Mod;
 
-public abstract class Tile extends IdentifiableModFeature
+public abstract class Tile extends IdentifiableFeature
 {
-	public Tile(String id, ModInstance mod)
+	public Tile(String id, Mod mod)
 	{
-		super(id, mod);
+		super(mod, id);
 	}
 }

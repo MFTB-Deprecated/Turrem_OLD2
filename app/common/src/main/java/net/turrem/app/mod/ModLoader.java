@@ -20,11 +20,20 @@ import net.turrem.app.mod.event.OnPreLoad;
 import net.turrem.app.mod.event.PreRegister;
 import net.turrem.utils.JarExplore;
 
+import com.google.common.base.Charsets;
 import com.google.common.collect.ArrayListMultimap;
+import com.google.common.io.Files;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonParser;
 
 public class ModLoader
 {
+	private static final JsonParser parser = new JsonParser();
+	
 	private static ModLoader instance;
+	
 	private HashMap<Mod, ModInstance> mods = new HashMap<Mod, ModInstance>();
 	private final EnumSide side;
 	private final File modsDir;
@@ -56,42 +65,83 @@ public class ModLoader
 		}
 		for (File modDir : this.modsDir.listFiles())
 		{
-			Mod mod = new Mod(modDir.getName(), null);
-			ModInstance modi = new ModInstance();
-			boolean hasInfo = false;
-			boolean hasAssets = false;
-			boolean hasJar = false;
-			for (File file : modDir.listFiles())
+			try
 			{
-				String name = file.getName();
-				if (name.equals("mod.info") && file.isFile())
-				{
-					hasInfo = true;
-				}
-				else if (name.equals("assets") && file.isDirectory())
-				{
-					hasAssets = true;
-				}
-				else if (name.equals(this.side.id + ".jar"))
-				{
-					hasJar = true;
-				}
+				ModInstance mod = this.buildMod(modDir);
+				this.mods.put(mod.mod, mod);
 			}
-			if (hasJar)
-			{
-				
-			}
-			else
+			catch (IOException e)
 			{
 				
 			}
 		}
 	}
 	
-	public void loadModClasses(ClassLoader parent)
+	private ModInstance buildMod(File modDir) throws IOException, JsonParseException
+	{
+		Mod mod = new Mod(modDir.getName(), null);
+		ModInstance modi = new ModInstance();
+		for (File file : modDir.listFiles())
+		{
+			String name = file.getName();
+			if (name.equals("mod.info") && file.isFile())
+			{
+				try
+				{
+					mod = this.parseModInfo(mod, modi, file);
+					modi.hasInfo = true;
+				}
+				catch (JsonParseException e)
+				{
+					System.out.printf("The mod.info file for %s was not valid JSON.%n", mod.identifier);
+				}
+				catch (IllegalStateException | ClassCastException e)
+				{
+					System.out.printf("The mod.info file for %s was valid JSON but was not a valid mod descriptor.%n", mod.identifier);
+				}
+			}
+			else if (name.equals("assets") && file.isDirectory())
+			{
+				modi.hasAssets = true;
+			}
+			else if (name.equals(EnumSide.CLIENT.id + ".jar") && file.isFile())
+			{
+				modi.hasJar[0] = true;
+			}
+			else if (name.equals(EnumSide.SERVER.id + ".jar") && file.isFile())
+			{
+				modi.hasJar[1] = true;
+			}
+		}
+		modi.mod = mod;
+		return modi;
+	}
+	
+	private Mod parseModInfo(Mod mod, ModInstance modi, File info) throws IOException, JsonParseException, IllegalStateException, ClassCastException
+	{
+		JsonElement rootel = parser.parse(Files.toString(info, Charsets.UTF_8));
+		JsonObject root = rootel.getAsJsonObject();
+		JsonElement version = root.get("version");
+		if (version != null)
+		{
+			mod = new Mod(mod.identifier, version.getAsString());
+		}
+		JsonElement name = root.get("name");
+		if (name != null)
+		{
+			modi.name = name.getAsString();
+		}
+		else
+		{
+			modi.name = mod.identifier;
+		}
+		return mod;
+	}
+	
+	public ClassLoader loadModClasses(ClassLoader parent)
 	{
 		ArrayList<URL> jarlist = new ArrayList<URL>();
-		for (ModInstance mod : this.mods.values())
+		for (Mod mod : this.mods.keySet())
 		{
 			File jar = this.getModJarFile(mod);
 			if (jar.exists())
@@ -112,13 +162,13 @@ public class ModLoader
 		}
 		URL[] jars = new URL[jarlist.size()];
 		jars = jarlist.toArray(jars);
-		this.modClassLoader = URLClassLoader.newInstance(jars, parent);
+		return URLClassLoader.newInstance(jars, parent);
 	}
 	
 	public void loadMods()
 	{
 		ArrayListMultimap<ModInstance, Class<?>> claz = ArrayListMultimap.create();
-		for (ModInstance mod : this.mods.values())
+		for (Mod mod : this.mods.keySet())
 		{
 			try
 			{
@@ -152,15 +202,15 @@ public class ModLoader
 				break;
 		}
 		jar += ".jar";
-		return new File(this.modDirectory, id + jar);
+		return new File(this.modsDir, id + jar);
 	}
 	
-	protected JarFile getModJar(ModInstance mod) throws IOException
+	protected JarFile getModJar(Mod mod) throws IOException
 	{
 		return this.getModJar(mod.identifier);
 	}
 	
-	protected File getModJarFile(ModInstance mod)
+	protected File getModJarFile(Mod mod)
 	{
 		return this.getModJarFile(mod.identifier);
 	}

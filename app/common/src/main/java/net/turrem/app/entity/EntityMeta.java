@@ -1,13 +1,13 @@
 package net.turrem.app.entity;
 
 import net.turrem.app.EnumSide;
-import net.turrem.app.mod.ModInstance;
+import net.turrem.app.mod.Mod;
 
 abstract class EntityMeta
 {
 	EnumSide side = null;
 	private final String id;
-	ModInstance mod = null;
+	Mod mod = null;
 	
 	public EntityMeta(String id)
 	{
@@ -24,7 +24,7 @@ abstract class EntityMeta
 		return this.id;
 	}
 	
-	public ModInstance getMod()
+	public Mod getMod()
 	{
 		return this.mod;
 	}

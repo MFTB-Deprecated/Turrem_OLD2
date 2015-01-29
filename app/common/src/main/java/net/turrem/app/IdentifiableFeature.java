@@ -2,12 +2,12 @@ package net.turrem.app;
 
 import net.turrem.app.mod.Mod;
 
-public class GameIdentifier
+public class IdentifiableFeature
 {
 	public final Mod mod;
 	public final String identifier;
 	
-	public GameIdentifier(Mod mod, String identifier)
+	public IdentifiableFeature(Mod mod, String identifier)
 	{
 		this.mod = mod;
 		this.identifier = identifier;
@@ -24,11 +24,11 @@ public class GameIdentifier
 		return this.getRaw();
 	}
 	
-	public static GameIdentifier fromRaw(String raw)
+	public static IdentifiableFeature fromRaw(String raw)
 	{
 		int split = raw.indexOf(':');
 		Mod mod = Mod.getMod(raw.substring(0, split));
 		String id = raw.substring(split + 1);
-		return new GameIdentifier(mod, id);
+		return new IdentifiableFeature(mod, id);
 	}
 }

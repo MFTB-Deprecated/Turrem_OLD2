@@ -15,13 +15,13 @@ public class TileRegistry
 	{
 		if (tile instanceof BasicTile || tile instanceof DynamicTile)
 		{
-			String id = tile.getId();
+			String id = tile.getRaw();
 			if (tiles.containsKey(id))
 			{
 				System.out.printf("A tile with id %s already exists, it will be overridden!");
 			}
 			tiles.put(id, tile);
 		}
-		System.out.printf("Failed to register a tile (id: %s) because it did not extend BasicTile or DynamicTile.%n", tile.getId());
+		System.out.printf("Failed to register a tile (id: %s) because it did not extend BasicTile or DynamicTile.%n", tile.getRaw());
 	}
 }
