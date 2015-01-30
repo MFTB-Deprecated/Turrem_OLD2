@@ -1,27 +1,27 @@
 package net.turrem.app.client.network;
 
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.net.Socket;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import net.turrem.app.Config;
-import net.turrem.app.client.game.world.ClientWorld;
+import net.turrem.app.client.game.ClientGame;
 import net.turrem.app.client.network.client.ClientPacket;
 import net.turrem.app.client.network.client.ClientPacketKeepAlive;
 import net.turrem.app.client.network.server.NullPacket;
 import net.turrem.app.client.network.server.ServerPacket;
 import net.turrem.app.client.network.server.ServerPacketManager;
+import net.turrem.app.network.NetworkConnection;
 
 public class GameConnection
 {
 	public static int serverLimitPerTick = 1000;
 	
-	protected ClientWorld theWorld;
+	public NetworkConnection network;
 	
-	public Socket network;
+	public ClientGame theGame;
 	
 	public Queue<ClientPacket> outgoing;
 	public Queue<ServerPacket> incoming;
@@ -38,16 +38,16 @@ public class GameConnection
 	
 	private int currentWriteCount = 0;
 	
-	public GameConnection(Socket network, ClientWorld world) throws IOException
+	public GameConnection(NetworkConnection network, ClientGame game)
 	{
-		this.theWorld = world;
 		this.isRunning = true;
 		this.network = network;
+		this.theGame = game;
 		this.outgoing = new ConcurrentLinkedQueue<ClientPacket>();
 		this.incoming = new ConcurrentLinkedQueue<ServerPacket>();
 		
-		this.input = new DataInputStream(this.network.getInputStream());
-		this.output = new DataOutputStream(this.network.getOutputStream());
+		this.input = this.network.getInput();
+		this.output = this.network.getOutput();
 		
 		this.readThread = new ConnectionReaderThread(this);
 		this.writeThread = new ConnectionWriterThread(this);
@@ -201,52 +201,12 @@ public class GameConnection
 			ServerPacket pak = this.incoming.poll();
 			if (pak != null)
 			{
-				pak.processPacket(this.theWorld);
+				this.theGame.processPacket(pak);
 			}
 			else
 			{
 				break;
 			}
-		}
-	}
-	
-	public void shutdown(String reason, Exception... cause)
-	{
-		System.out.println("Network Shutdown: " + reason);
-		if (this.isRunning)
-		{
-			this.isRunning = false;
-			
-			try
-			{
-				this.network.shutdownInput();
-			}
-			catch (IOException e)
-			{
-				e.printStackTrace();
-			}
-			
-			try
-			{
-				this.network.shutdownOutput();
-			}
-			catch (IOException e)
-			{
-				e.printStackTrace();
-			}
-			
-			try
-			{
-				this.network.close();
-			}
-			catch (IOException e)
-			{
-				e.printStackTrace();
-			}
-			
-			this.input = null;
-			this.output = null;
-			this.network = null;
 		}
 	}
 }

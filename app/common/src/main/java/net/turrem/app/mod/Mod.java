@@ -9,7 +9,12 @@ public class Mod
 	public final String version;
 	public final int hash;
 	
-	Mod(String id, String version)
+	public Mod(String id)
+	{
+		this(id, null);
+	}
+	
+	public Mod(String id, String version)
 	{
 		this.identifier = id;
 		this.version = version;
@@ -19,11 +24,6 @@ public class Mod
 	public boolean isApp()
 	{
 		return this.identifier.equals("app");
-	}
-	
-	public boolean isRemovableMod()
-	{
-		return !this.isApp() && this.identifier.equals("core");
 	}
 	
 	@Override

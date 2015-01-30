@@ -1,9 +1,9 @@
 package net.turrem.app.tile;
 
-import net.turrem.app.IdentifiableFeature;
+import net.turrem.app.FeatureName;
 import net.turrem.app.mod.Mod;
 
-public abstract class Tile extends IdentifiableFeature
+public abstract class Tile extends FeatureName
 {
 	public Tile(String id, Mod mod)
 	{

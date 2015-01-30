@@ -39,8 +39,11 @@ public class ModLoader
 	private final File modsDir;
 	private boolean loaded = false;
 	
-	public ModLoader(File modsDir, EnumSide side)
+	public final ClassLoader theGameLoader;
+	
+	public ModLoader(File modsDir, EnumSide side, ClassLoader gameLoader)
 	{
+		this.theGameLoader = gameLoader;
 		this.modsDir = modsDir;
 		this.side = side;
 		instance = this;
@@ -54,6 +57,20 @@ public class ModLoader
 	public ModInstance getMod(Mod mod)
 	{
 		return this.mods.get(mod);
+	}
+	
+	public ClassLoader getClassLoader(Mod mod)
+	{
+		if (Mod.APP.equals(mod))
+		{
+			return this.theGameLoader;
+		}
+		ModInstance modi = this.getMod(mod);
+		if (modi == null)
+		{
+			return null;
+		}
+		return modi.getClassLoader();
 	}
 	
 	public void buildModList()

@@ -9,6 +9,7 @@ public class ModInstance
 	boolean hasInfo = false;
 	boolean hasAssets = false;
 	boolean hasJar[] = { false, false };
+	ClassLoader modClassLoader;
 	
 	public Mod mod()
 	{
@@ -28,6 +29,11 @@ public class ModInstance
 	public boolean hasAssets()
 	{
 		return this.hasAssets;
+	}
+	
+	public ClassLoader getClassLoader()
+	{
+		return this.modClassLoader;
 	}
 	
 	public boolean hasJar(EnumSide side)

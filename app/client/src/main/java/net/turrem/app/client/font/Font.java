@@ -8,6 +8,7 @@ import java.nio.ByteBuffer;
 import java.util.PrimitiveIterator.OfInt;
 
 import net.turrem.app.client.asset.AssetLoader;
+import net.turrem.app.client.asset.GameAsset;
 import net.turrem.app.utils.graphics.GLUtils;
 import net.turrem.app.utils.graphics.ImgUtils;
 
@@ -22,10 +23,10 @@ public class Font
 	public final int size;
 	public final int lineHeight;
 	private int[] textures;
-	private String[] texturePaths;
+	private GameAsset[] texturePaths;
 	private boolean loaded = false;
 	
-	Font(int size, int lineHeight, String[] texturePaths)
+	Font(int size, int lineHeight, GameAsset[] texturePaths)
 	{
 		this.size = size;
 		this.lineHeight = lineHeight;
@@ -70,7 +71,7 @@ public class Font
 		this.loaded = false;
 	}
 	
-	private int loadTexture(String path, AssetLoader render) throws IOException
+	private int loadTexture(GameAsset path, AssetLoader render) throws IOException
 	{
 		BufferedImage img = render.loadTexture(path);
 		if (img != null)

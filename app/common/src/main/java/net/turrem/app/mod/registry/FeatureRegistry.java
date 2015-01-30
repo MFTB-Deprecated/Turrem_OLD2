@@ -2,9 +2,9 @@ package net.turrem.app.mod.registry;
 
 import java.util.HashMap;
 
-import net.turrem.app.IdentifiableFeature;
+import net.turrem.app.FeatureName;
 
-public class FeatureRegistry<T extends IdentifiableFeature> implements IInstanceRegistry<T>
+public class FeatureRegistry<T extends FeatureName> implements IInstanceRegistry<T>
 {
 	private HashMap<String, T> items = new HashMap<String, T>();
 	
