@@ -1,17 +1,16 @@
 configure(subprojects) 
 {
 	def n = it.path
-	def useGuava = false
-	def useGson = false
-	def useLWJGL = false
-	def useTrove = false
+	def libs = [:]
 	if (n == ':utils')
 	{
 		apply plugin: 'java'
 		apply plugin: 'eclipse'
-		useGuava = true
-		useGson = true
-		useTrove = true
+		
+		libs.guava = true
+		libs.gson = true
+		libs.trove = true
+		libs.log4j = true
 	}
 	else if (n ==~ ':(app|mod|coremod):(client|common|server)')
 	{		
@@ -28,12 +27,13 @@ configure(subprojects)
 		def isClient = sidename == 'client'
 		def isCommon = sidename == 'common'
 		def isServer = sidename == 'server'
-
+		
 		if (isApp)
 		{
-			useGuava = true
-			useGson = true
-			useTrove = true
+			libs.guava = true
+			libs.gson = true
+			libs.trove = true
+			libs.log4j = true
 			
 			dependencies 
 			{
@@ -43,7 +43,7 @@ configure(subprojects)
 		
 		if (isClient)
 		{
-			useLWJGL = true
+			libs.lwjgl = true
 		}
 
 		eclipse 
@@ -88,40 +88,53 @@ configure(subprojects)
 			}
 		}
 	}
-	if (useGuava || useGson || useLWJGL || useTrove)
+	def repos = [:]
+	if (libs.guava)
 	{
-		repositories 
-		{
-			mavenCentral()
-		}
-	}
-	if (useGuava)
-	{
+		repos.mavcent = true
 		dependencies 
 		{
 			compile group: 'com.google.guava', name: 'guava', version: '18.0'
 		}
 	}
-	if (useGson)
+	if (libs.gson)
 	{
+		repos.mavcent = true
 		dependencies 
 		{
 			compile group: 'com.google.code.gson', name: 'gson', version: '2.3'
 		}
 	}
-	if (useLWJGL)
+	if (libs.lwjgl)
 	{
+		repos.mavcent = true
 		dependencies 
 		{
 			compile group: 'org.lwjgl.lwjgl', name: 'lwjgl', version: '2.9.1'
 			compile group: 'org.lwjgl.lwjgl', name: 'lwjgl_util', version: '2.9.1'
 		}
 	}
-	if (useTrove)
+	if (libs.trove)
 	{
+		repos.mavcent = true
 		dependencies 
 		{
 			compile group: 'net.sf.trove4j', name: 'trove4j', version: '3.0.3'
+		}
+	}
+	if (libs.log4j)
+	{
+		repos.mavcent = true
+		dependencies 
+		{
+			compile group: 'org.apache.logging.log4j', name: 'log4j', version: '2.1'
+		}
+	}
+	if (repos.mavcent)
+	{
+		repositories 
+		{
+			mavenCentral()
 		}
 	}
 }

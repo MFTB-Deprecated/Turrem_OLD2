@@ -34,7 +34,7 @@ public abstract class ThreadedLoop
 	public final void start()
 	{
 		this.running = true;
-		if (this.loop.isAlive())
+		if (!this.loop.isAlive())
 		{
 			this.loop.start();
 		}
