@@ -1,5 +1,6 @@
 package net.turrem.app.client.font;
 
+import net.turrem.app.client.asset.GameAsset;
 import net.turrem.app.client.font.bmf.BMFBlockChars.BMFChar;
 import net.turrem.app.client.font.bmf.BMFBlockKerning.BMFKerningPair;
 import net.turrem.app.client.font.bmf.BMFFile;
@@ -7,13 +8,13 @@ import net.turrem.app.client.font.bmf.BMFFile;
 public class BMFConvertToFont
 {
 	private BMFFile bmf;
-	private String texturePrefix;
+	private GameAsset textureLocation;
 	private Font font = null;
 	
-	public BMFConvertToFont(BMFFile bmf, String texturePrefix)
+	public BMFConvertToFont(BMFFile bmf, GameAsset textureLocation)
 	{
 		this.bmf = bmf;
-		this.texturePrefix = texturePrefix;
+		this.textureLocation = textureLocation;
 	}
 	
 	public Font getFont()
@@ -27,10 +28,10 @@ public class BMFConvertToFont
 	
 	private void convert()
 	{
-		String[] textures = new String[this.bmf.pages.pageNames.length];
+		GameAsset[] textures = new GameAsset[this.bmf.pages.pageNames.length];
 		for (int i = 0; i < textures.length; i++)
 		{
-			textures[i] = this.texturePrefix + this.bmf.pages.pageNames[i];
+			textures[i] = new GameAsset(this.textureLocation, this.bmf.pages.pageNames[i]);
 		}
 		this.font = new Font(this.bmf.info.fontSize, this.bmf.common.lineHeight, textures);
 		for (BMFChar c : this.bmf.chars.chars)

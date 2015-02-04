@@ -1,9 +1,13 @@
 package net.turrem.app.client.asset;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
+
+import javax.imageio.ImageIO;
 
 import net.turrem.app.client.Turrem;
 
@@ -30,6 +34,11 @@ public class AssetLoader
 	public static AssetLoader instance()
 	{
 		return instance;
+	}
+	
+	public BufferedImage readImage(GameAsset asset) throws IOException
+	{
+		return ImageIO.read(this.getInput(asset));
 	}
 	
 	public InputStream getInput(GameAsset asset)

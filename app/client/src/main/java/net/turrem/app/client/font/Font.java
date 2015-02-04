@@ -73,7 +73,7 @@ public class Font
 	
 	private int loadTexture(GameAsset path, AssetLoader render) throws IOException
 	{
-		BufferedImage img = render.loadTexture(path);
+		BufferedImage img = render.readImage(path);
 		if (img != null)
 		{
 			int texId = GL11.glGenTextures();

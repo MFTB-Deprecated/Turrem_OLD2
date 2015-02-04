@@ -40,6 +40,10 @@ public class Mod
 	@Override
 	public boolean equals(Object x)
 	{
+		if (x == this)
+		{
+			return true;
+		}
 		if (x instanceof Mod)
 		{
 			Mod mod = (Mod) x;
