@@ -4,8 +4,10 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 
 import javax.imageio.ImageIO;
 
@@ -39,6 +41,45 @@ public class AssetLoader
 	public BufferedImage readImage(GameAsset asset) throws IOException
 	{
 		return ImageIO.read(this.getInput(asset));
+	}
+	
+	public BufferedImage readImage(Asset asset) throws IOException
+	{
+		return ImageIO.read(this.getInput(asset.getAsset("png")));
+	}
+	
+	public OutputStream getOutput(GameAsset asset)
+	{
+		return this.getOutput(asset, true);
+	}
+	
+	public OutputStream getOutput(GameAsset asset, boolean createIfMissing)
+	{
+		return this.getOutput(asset, createIfMissing, false);
+	}
+	
+	public OutputStream getOutput(GameAsset asset, boolean createIfMissing, boolean append)
+	{
+		if (asset.isDirectory() || asset.isPacked())
+		{
+			return null;
+		}
+		else
+		{
+			try
+			{
+				File f = asset.getFile();
+				if (!f.exists() && createIfMissing)
+				{
+					f.createNewFile();
+				}
+				return new FileOutputStream(f, append);
+			}
+			catch (IOException e)
+			{
+				return null;
+			}
+		}
 	}
 	
 	public InputStream getInput(GameAsset asset)

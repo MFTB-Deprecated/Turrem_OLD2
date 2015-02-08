@@ -9,6 +9,10 @@ public class FeatureName
 	
 	public FeatureName(Mod mod, String identifier)
 	{
+		if (mod == null)
+		{
+			mod = Mod.APP;
+		}
 		this.mod = mod;
 		this.identifier = identifier;
 	}
@@ -27,8 +31,13 @@ public class FeatureName
 	public static FeatureName fromRaw(String raw)
 	{
 		int split = raw.indexOf(':');
-		Mod mod = Mod.getMod(raw.substring(0, split));
-		String id = raw.substring(split + 1);
+		String id = raw;
+		Mod mod = Mod.APP;
+		if (split != -1)
+		{
+			mod = Mod.getMod(raw.substring(0, split));
+			id = raw.substring(split + 1);
+		}
 		return new FeatureName(mod, id);
 	}
 }
