@@ -1,11 +1,11 @@
-package net.turrem.app.client.render;
+package net.turrem.app.client.render.fbo;
 
 import java.util.Arrays;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL30;
 
-public class FrameBufferObject
+class FrameBufferObject
 {
 	private static final int[] colorAttachments;
 	

@@ -2,9 +2,9 @@ package net.turrem.app.client.gui;
 
 import java.util.ArrayList;
 
-import net.turrem.app.client.render.FrameBufferObject;
 import net.turrem.app.client.render.IScreenLayer;
 import net.turrem.app.client.render.RenderEngine;
+import net.turrem.app.client.render.fbo.DiffuseFBO;
 
 public class GuiStack implements IScreenLayer
 {
@@ -29,7 +29,7 @@ public class GuiStack implements IScreenLayer
 	}
 	
 	@Override
-	public void render(RenderEngine engine, FrameBufferObject target)
+	public void render(RenderEngine engine, DiffuseFBO target)
 	{
 		this.isOutdated = false;
 	}
