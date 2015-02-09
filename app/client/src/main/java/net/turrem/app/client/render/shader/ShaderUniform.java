@@ -1,5 +1,6 @@
 package net.turrem.app.client.render.shader;
 
+import java.awt.Color;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -72,7 +73,7 @@ public class ShaderUniform
 		}
 	}
 	
-	public final String name;
+	public String name;
 	private Method call = null;
 	private Object[] data = null;
 	
@@ -93,7 +94,7 @@ public class ShaderUniform
 			return false;
 		}
 		int loc = GL20.glGetUniformLocation(pid, this.name);
-		if (loc <= 0)
+		if (loc == -1)
 		{
 			return false;
 		}
@@ -112,6 +113,12 @@ public class ShaderUniform
 			return false;
 		}
 		return true;
+	}
+	
+	public void set(EnumUniformCalls call, Object... data)
+	{
+		this.call = call.call;
+		this.data = data;
 	}
 	
 	public void setInt(int value)
@@ -153,6 +160,12 @@ public class ShaderUniform
 		}
 	}
 	
+	public void setInts(int size, IntBuffer buf)
+	{
+		this.call = EnumUniformCalls.UNIFORM_1IV.call;
+		this.data = new Object[] { size, buf };
+	}
+	
 	public void setFloats(float... value)
 	{
 		switch (value.length)
@@ -178,6 +191,12 @@ public class ShaderUniform
 				this.data = new Object[] { value.length, GLUtils.bufferFloats(value) };
 				return;
 		}
+	}
+	
+	public void setFloats(int size, FloatBuffer buf)
+	{
+		this.call = EnumUniformCalls.UNIFORM_1FV.call;
+		this.data = new Object[] { size, buf };
 	}
 	
 	public void setVector(Vector value)
@@ -350,6 +369,44 @@ public class ShaderUniform
 	{
 		this.call = EnumUniformCalls.UNIFORM_MATRIX_4FV.call;
 		this.setMatricies(4, transpose, value);
+	}
+	
+	public void setColorRGB(Color value)
+	{
+		this.setColorsRGB(value);
+	}
+	
+	public void setColorsRGB(Color... value)
+	{
+		FloatBuffer buf = FloatBuffer.allocate(3 * value.length);
+		float[] comps = new float[3];
+		for (int i = 0; i < value.length; i++)
+		{
+			value[i].getRGBColorComponents(comps);
+			buf.put(comps);
+		}
+		buf.flip();
+		this.call = EnumUniformCalls.UNIFORM_3FV.call;
+		this.data = new Object[] { value.length, buf };
+	}
+	
+	public void setColorRGBA(Color value)
+	{
+		this.setColorsRGBA(value);
+	}
+	
+	public void setColorsRGBA(Color... value)
+	{
+		FloatBuffer buf = FloatBuffer.allocate(4 * value.length);
+		float[] comps = new float[4];
+		for (int i = 0; i < value.length; i++)
+		{
+			value[i].getRGBComponents(comps);
+			buf.put(comps);
+		}
+		buf.flip();
+		this.call = EnumUniformCalls.UNIFORM_4FV.call;
+		this.data = new Object[] { value.length, buf };
 	}
 	
 	private Object[] getArray(Object val)

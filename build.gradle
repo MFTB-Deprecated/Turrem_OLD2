@@ -34,6 +34,7 @@ configure(subprojects)
 			libs.gson = true
 			libs.trove = true
 			libs.log4j = true
+			libs.commonsio = true
 			
 			dependencies 
 			{
@@ -128,6 +129,14 @@ configure(subprojects)
 		dependencies 
 		{
 			compile group: 'org.apache.logging.log4j', name: 'log4j', version: '2.1'
+		}
+	}
+	if (libs.commonsio)
+	{
+		repos.mavcent = true
+		dependencies 
+		{
+			compile 'org.apache.commons:commons-io:1.3.2'
 		}
 	}
 	if (repos.mavcent)
