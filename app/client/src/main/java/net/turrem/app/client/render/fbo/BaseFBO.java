@@ -25,6 +25,11 @@ public abstract class BaseFBO
 		this.buffers = new int[EnumDrawBufferLocs.numberOfLocations];
 	}
 	
+	public int getFBO()
+	{
+		return this.fbo.getBuffer();
+	}
+	
 	public int getTexture(int attachment)
 	{
 		return this.fbo.getTexture(attachment);
@@ -89,5 +94,38 @@ public abstract class BaseFBO
 	public void unbind()
 	{
 		this.fbo.unbind();
+	}
+	
+	public void drawFull(boolean saveMatrix)
+	{
+		GL11.glMatrixMode(GL11.GL_PROJECTION);
+		if (saveMatrix)
+		{
+			GL11.glPushMatrix();
+		}
+		GL11.glLoadIdentity();
+		GL11.glMatrixMode(GL11.GL_MODELVIEW);
+		if (saveMatrix)
+		{
+			GL11.glPushMatrix();
+		}
+		GL11.glLoadIdentity();
+		GL11.glBegin(GL11.GL_QUADS);
+		GL11.glTexCoord2f(0, 0);
+		GL11.glVertex2f(-1, -1);
+		GL11.glTexCoord2f(1, 0);
+		GL11.glVertex2f(1, -1);
+		GL11.glTexCoord2f(1, 1);
+		GL11.glVertex2f(1, 1);
+		GL11.glTexCoord2f(0, 1);
+		GL11.glVertex2f(-1, 1);
+		GL11.glEnd();
+		if (saveMatrix)
+		{
+			GL11.glPopMatrix();
+			GL11.glMatrixMode(GL11.GL_PROJECTION);
+			GL11.glPopMatrix();
+			GL11.glMatrixMode(GL11.GL_MODELVIEW);
+		}
 	}
 }

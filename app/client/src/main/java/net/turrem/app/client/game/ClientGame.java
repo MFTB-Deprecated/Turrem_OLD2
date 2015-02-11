@@ -1,9 +1,7 @@
 package net.turrem.app.client.game;
 
 import java.io.IOException;
-import java.net.Socket;
 
-import net.turrem.app.Config;
 import net.turrem.app.client.Turrem;
 import net.turrem.app.client.game.world.ClientWorld;
 import net.turrem.app.client.game.world.data.ClientWorldData;
@@ -82,8 +80,8 @@ public class ClientGame
 	
 	public void startNetwork(String username) throws IOException
 	{
-		this.network = new NetworkConnection(new Socket(Config.turremServerHost, Config.turremServerPort));
-		this.theConnection = new GameConnection(this.network, this);
+		this.network = null;//new NetworkConnection(new Socket(Config.turremServerHost, Config.turremServerPort));
+		this.theConnection = null;//new GameConnection(this.network, this);
 	}
 	
 	public void processPacket(ServerPacket pack)

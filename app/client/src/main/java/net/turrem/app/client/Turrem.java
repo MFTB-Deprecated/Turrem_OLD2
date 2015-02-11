@@ -11,25 +11,31 @@ import javax.imageio.ImageIO;
 import net.turrem.app.EnumSide;
 import net.turrem.app.Global;
 import net.turrem.app.client.asset.AssetLoader;
+import net.turrem.app.client.asset.GameAsset;
+import net.turrem.app.client.render.GameScreen;
+import net.turrem.app.client.render.RenderEngine;
 import net.turrem.app.mod.ModLoader;
 import net.turrem.app.utils.graphics.ImgUtils;
 
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.DisplayMode;
 
 public class Turrem
 {
 	private static Turrem instance;
 	
-	private static int width;
-	private static int height;
+	private static int width = 640;
+	private static int height = 480;
 	
 	public final Session theSession;
 	public final File theGameDir;
 	public final AssetLoader theAssetLoader;
 	
 	public ModLoader modLoader;
+	
+	public RenderEngine engine;
 	
 	public Turrem(Session session, String dir)
 	{
@@ -75,12 +81,27 @@ public class Turrem
 		
 		try
 		{
+			Display.setDisplayMode(new DisplayMode(Turrem.width(), Turrem.height()));
 			Display.create();
 		}
 		catch (LWJGLException e)
 		{
 			e.printStackTrace();
 		}
+		
+		this.engine = new RenderEngine();
+		
+		GameScreen screen = new GameScreen(this.engine);
+		
+		while (!this.closeRequested())
+		{
+			screen.render();
+		}
+	}
+	
+	public boolean closeRequested()
+	{
+		return Display.isCloseRequested();
 	}
 	
 	public void onCrash(Exception e)
@@ -99,9 +120,9 @@ public class Turrem
 	{
 		ArrayList<ByteBuffer> icos = new ArrayList<ByteBuffer>();
 		
-		File folder = new File(this.theGameDir, "client/resources/appicons");
+		GameAsset appicons = GameAsset.fromRaw("icons/");
 		
-		File[] filelist = folder.listFiles();
+		File[] filelist = appicons.getFile().listFiles();
 		
 		for (File icon : filelist)
 		{

@@ -100,6 +100,30 @@ public class GameAsset
 		return dir;
 	}
 	
+	public GameAsset[] getAssets()
+	{
+		if (!this.isDirectory())
+		{
+			return null;
+		}
+		if (this.isPacked())
+		{
+			return null;
+		}
+		File[] files = this.getFile().listFiles();
+		GameAsset[] assets = new GameAsset[files.length];
+		for (int i = 0; i < files.length; i++)
+		{
+			String name = files[i].getName();
+			if (files[i].isDirectory())
+			{
+				name += "/";
+			}
+			assets[i] = new GameAsset(this, name);
+		}
+		return assets;
+	}
+	
 	public String pathFromGameDir()
 	{
 		String path = "/";

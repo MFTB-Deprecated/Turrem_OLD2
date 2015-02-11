@@ -2,7 +2,7 @@ package net.turrem.app.client.game;
 
 public class Timer
 {
-	public float ticksPerSecond;
+	public float ticksPerSecond = 20.0F;
 	
 	public long lastUpdateTime;
 	

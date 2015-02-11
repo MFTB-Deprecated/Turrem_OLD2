@@ -1,6 +1,5 @@
 package net.turrem.app.client.game;
 
-import net.turrem.app.Config;
 import net.turrem.app.client.ClientConfig;
 import net.turrem.app.client.game.world.ClientWorld;
 import net.turrem.utils.geo.EnumDir;
@@ -28,12 +27,6 @@ public class PlayerFace
 	private float znear = 1.0F;
 	private float fovy = 60.0F;
 	
-	private int requestChunkSelector = 0;
-	
-	private long lastChunkRequestTime = 0;
-	private int lastChunkRequestX;
-	private int lastChunkRequestZ;
-	
 	private int pickx;
 	private int picky;
 	private int pickz;
@@ -44,8 +37,6 @@ public class PlayerFace
 		this.reset();
 		this.camFocus = Point.getPoint(0.0D, 128.0D, 0.0D);
 		this.camLoc = Point.getPoint(0.0D, 0.0D, 0.0D);
-		this.lastChunkRequestX = (int) this.camLoc.xCoord;
-		this.lastChunkRequestZ = (int) this.camLoc.zCoord;
 		this.doFocus();
 		this.updatePars();
 	}
@@ -153,6 +144,7 @@ public class PlayerFace
 	
 	protected void rayPickTerrain(Point origin, Vector direction, float radius, ClientWorld world)
 	{
+		/*
 		// Cube containing origin point.
 		int x = (int) origin.xCoord;
 		int y = (int) origin.yCoord;
@@ -274,6 +266,7 @@ public class PlayerFace
 				}
 			}
 		}
+		*/
 		this.pickx = -1;
 		this.picky = -1;
 		this.pickz = -1;
@@ -306,12 +299,7 @@ public class PlayerFace
 	
 	private boolean testPickTerrain(int x, int y, int z, EnumDir face, ClientWorld world)
 	{
-		Chunk chunk = world.getChunk(x >> Config.chunkBitSize, z >> Config.chunkBitSize);
-		if (chunk == null)
-		{
-			return false;
-		}
-		return chunk.getHeight(x, z) > y;
+		return false;
 	}
 	
 	public Ray pickCamera()
@@ -321,21 +309,6 @@ public class PlayerFace
 	
 	public void tickCamera(ClientWorld world)
 	{
-		long currentTime = System.currentTimeMillis();
-		if (currentTime - this.lastChunkRequestTime > ClientConfig.chunkRequestTimeLimit || this.lastChunkRequestTime == 0)
-		{
-			int dx = this.lastChunkRequestX - (int) this.camLoc.xCoord;
-			int dz = this.lastChunkRequestZ - (int) this.camLoc.zCoord;
-			if (dx * dx + dz * dz > Config.chunkSize * Config.chunkSize)
-			{
-				this.lastChunkRequestX = (int) this.camLoc.xCoord;
-				this.lastChunkRequestZ = (int) this.camLoc.zCoord;
-				this.requestChunkSelector = 0;
-			}
-			this.lastChunkRequestTime = currentTime;
-			this.requestChunkSelector = world.requestNullChunks((int) this.camLoc.xCoord, (int) this.camLoc.zCoord, this.requestChunkSelector, 8);
-		}
-		
 		int wm = Mouse.getDWheel();
 		if (Mouse.isButtonDown(2))
 		{
@@ -396,11 +369,11 @@ public class PlayerFace
 	
 	public int getLocalHorizon(ClientWorld world)
 	{
-		double x1 = this.camFocus.xCoord;
-		double z1 = this.camFocus.zCoord;
-		double x2 = this.camLoc.xCoord;
-		double z2 = this.camLoc.zCoord;
-		return world.getRayHeight(x1, z1, x2, z2, 5.0F);
+		//double x1 = this.camFocus.xCoord;
+		//double z1 = this.camFocus.zCoord;
+		//double x2 = this.camLoc.xCoord;
+		//double z2 = this.camLoc.zCoord;
+		return 0;//world.getRayHeight(x1, z1, x2, z2, 5.0F);
 	}
 	
 	public void reverseFocus()

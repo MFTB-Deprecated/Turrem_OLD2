@@ -209,4 +209,14 @@ public class GameConnection
 			}
 		}
 	}
+	
+	public void shutdown(String string)
+	{
+		System.err.println("The GameConnection is not finished!");
+	}
+	
+	public void shutdown(String string, Exception e)
+	{
+		System.err.println("The GameConnection is not finished!");
+	}
 }
