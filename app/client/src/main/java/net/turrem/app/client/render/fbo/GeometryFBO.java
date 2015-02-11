@@ -1,6 +1,7 @@
 package net.turrem.app.client.render.fbo;
 
 import java.nio.FloatBuffer;
+import java.util.EnumMap;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL30;
@@ -18,13 +19,14 @@ public class GeometryFBO extends DiffuseFBO
 	}
 	
 	@Override
-	protected void createAttachment(int attachment, int texture)
+	protected void createAttachment(int attachment, int texture, EnumMap<EnumDrawBufferLocs, Integer> locations)
 	{
 		switch (attachment)
 		{
 			case 1:
 				GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL30.GL_RGB16F, this.width, this.height, 0, GL11.GL_RGB, GL11.GL_FLOAT, (FloatBuffer) null);
 				GL30.glFramebufferTexture2D(GL30.GL_FRAMEBUFFER, GL30.GL_COLOR_ATTACHMENT1, GL11.GL_TEXTURE_2D, texture, 0);
+				locations.put(EnumDrawBufferLocs.NORMAL, GL30.GL_COLOR_ATTACHMENT1);
 				return;
 				
 			case 2:
@@ -33,7 +35,7 @@ public class GeometryFBO extends DiffuseFBO
 				return;
 				
 			default:
-				super.createAttachment(attachment, texture);
+				super.createAttachment(attachment, texture, locations);
 				return;
 		}
 	}
