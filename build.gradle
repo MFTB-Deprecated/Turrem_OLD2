@@ -1,18 +1,100 @@
+allprojects 
+{
+    apply plugin: 'java'
+    group = 'net.turrem'
+    version = '1.0'
+	
+	repositories 
+	{
+		mavenCentral()
+	}
+}
+
+File bin = file("/bin/")
+File libDir = file("$bin/libs/")
+
+def commonLibs = []
+def clientLibs = []
+def serverLibs = []
+
+commonLibs << 'com.google.guava:guava:18.0'
+commonLibs << 'com.google.code.gson:gson:2.3'
+clientLibs << 'org.lwjgl.lwjgl:lwjgl:2.9.1'
+clientLibs << 'org.lwjgl.lwjgl:lwjgl_util:2.9.1'
+commonLibs << 'net.sf.trove4j:trove4j:3.0.3'
+commonLibs << 'org.apache.logging.log4j:log4j:2.1'
+commonLibs << 'org.apache.commons:commons-io:1.3.2'
+
+def platforms = ['windows', 'linux', 'osx']
+platforms.each 
+{ 
+	platform -> task "${platform}Natives" {
+        def outputDir = "$libDir/natives/$platform"
+        inputs.files(configurations.compile)
+        outputs.dir(outputDir)
+        doLast 
+		{
+            copy 
+			{
+                def artifacts = configurations.compile.resolvedConfiguration.resolvedArtifacts.findAll { it.classifier == "natives-$platform" }
+                artifacts.each 
+				{
+					exclude "**/META-INF/**"
+                    from zipTree(it.file)
+                }            
+                into outputDir
+            }
+        }
+    }
+}
+
+task natives {
+    description "Moves natives into the lib/natives/ directory"
+    dependsOn platforms.collect { "${it}Natives" }.findAll { tasks[it] }
+}
+
+task libJars {
+	description "Moves library jars into the lib/ directory"
+	dependsOn natives
+    doLast 
+	{
+		copy
+		{
+			configurations.compile.files.each
+			{ File file -> 
+				exclude "**/*-natives-*.jar"
+				from file.getParent()
+				include file.getName()
+			}
+			into libDir
+		}
+	}
+}
+
+task appAssets(type: Copy) {
+	from 'app/assets/'
+	into "$bin/assets/"
+}
+
+task assets {
+	dependsOn appAssets
+}
+
+task makeBin {
+	dependsOn assets, libJars
+}
+
+dependencies
+{
+	compile commonLibs
+	compile clientLibs
+	compile serverLibs
+}
+
 configure(subprojects) 
 {
 	def n = it.path
-	def libs = [:]
-	if (n == ':utils')
-	{
-		apply plugin: 'java'
-		apply plugin: 'eclipse'
-		
-		libs.guava = true
-		libs.gson = true
-		libs.trove = true
-		libs.log4j = true
-	}
-	else if (n ==~ ':(app|mod|coremod):(client|common|server)')
+	if (n ==~ ':(app|mod|coremod):(client|common|server)')
 	{		
 		apply plugin: 'java'
 		apply plugin: 'eclipse'
@@ -28,122 +110,19 @@ configure(subprojects)
 		def isCommon = sidename == 'common'
 		def isServer = sidename == 'server'
 		
-		if (isApp)
+		dependencies
 		{
-			libs.guava = true
-			libs.gson = true
-			libs.trove = true
-			libs.log4j = true
-			libs.commonsio = true
-			
-			dependencies 
+			runtime commonLibs
+			if (isClient)
 			{
-				compile project(":utils")
+				compile project(":$partname:common")
+				runtime clientLibs
 			}
-		}
-		
-		if (isClient)
-		{
-			libs.lwjgl = true
-		}
-
-		eclipse 
-		{
-			project 
+			if (isServer)
 			{
-				name = partname + "." + sidename
+				compile project(":$partname:common")
+				runtime clientLibs
 			}
-		}
-		
-		if (!isCommon) 
-		{
-			dependencies 
-			{
-				compile project(":" + partname + ":common")
-			}
-		}
-		
-		if (isMod)
-		{
-			dependencies 
-			{
-				compile project(":coremod:" + sidename)
-				compile project(":app:" + sidename)
-				if (!isCommon) 
-				{
-					compile project(":coremod:common")
-					compile project(":app:common")
-				}
-			}
-		}
-		
-		if (isCoremod)
-		{
-			dependencies 
-			{
-				compile project(":app:" + sidename)
-				if (!isCommon) 
-				{
-					compile project(":app:common")
-				}
-			}
-		}
-	}
-	def repos = [:]
-	if (libs.guava)
-	{
-		repos.mavcent = true
-		dependencies 
-		{
-			compile group: 'com.google.guava', name: 'guava', version: '18.0'
-		}
-	}
-	if (libs.gson)
-	{
-		repos.mavcent = true
-		dependencies 
-		{
-			compile group: 'com.google.code.gson', name: 'gson', version: '2.3'
-		}
-	}
-	if (libs.lwjgl)
-	{
-		repos.mavcent = true
-		dependencies 
-		{
-			compile group: 'org.lwjgl.lwjgl', name: 'lwjgl', version: '2.9.1'
-			compile group: 'org.lwjgl.lwjgl', name: 'lwjgl_util', version: '2.9.1'
-		}
-	}
-	if (libs.trove)
-	{
-		repos.mavcent = true
-		dependencies 
-		{
-			compile group: 'net.sf.trove4j', name: 'trove4j', version: '3.0.3'
-		}
-	}
-	if (libs.log4j)
-	{
-		repos.mavcent = true
-		dependencies 
-		{
-			compile group: 'org.apache.logging.log4j', name: 'log4j', version: '2.1'
-		}
-	}
-	if (libs.commonsio)
-	{
-		repos.mavcent = true
-		dependencies 
-		{
-			compile 'org.apache.commons:commons-io:1.3.2'
-		}
-	}
-	if (repos.mavcent)
-	{
-		repositories 
-		{
-			mavenCentral()
 		}
 	}
 }

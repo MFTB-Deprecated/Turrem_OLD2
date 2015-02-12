@@ -6,5 +6,4 @@
 .recommenders
 *.class
 build/
-gradle-app.setting
-ui/
+/bin/
