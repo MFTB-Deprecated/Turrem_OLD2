@@ -110,6 +110,14 @@ configure(subprojects)
 		def isCommon = sidename == 'common'
 		def isServer = sidename == 'server'
 		
+		eclipse 
+		{
+			project 
+			{
+				name = partname + "." + sidename
+			}
+		}
+		
 		dependencies
 		{
 			runtime commonLibs

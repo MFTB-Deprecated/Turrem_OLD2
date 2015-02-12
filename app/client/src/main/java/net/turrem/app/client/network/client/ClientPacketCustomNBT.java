@@ -3,7 +3,7 @@ package net.turrem.app.client.network.client;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import net.turrem.utils.nbt.NBTCompound;
+import net.turrem.app.utils.nbt.NBTCompound;
 
 public class ClientPacketCustomNBT extends ClientPacket
 {

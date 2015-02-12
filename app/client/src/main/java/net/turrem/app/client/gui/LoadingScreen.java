@@ -1,6 +1,6 @@
 package net.turrem.app.client.gui;
 
-import net.turrem.utils.ThreadedLoop;
+import net.turrem.app.utils.ThreadedLoop;
 
 public class LoadingScreen extends ThreadedLoop
 {

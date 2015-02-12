@@ -2,10 +2,10 @@ package net.turrem.app.client.game;
 
 import net.turrem.app.client.ClientConfig;
 import net.turrem.app.client.game.world.ClientWorld;
-import net.turrem.utils.geo.EnumDir;
-import net.turrem.utils.geo.Point;
-import net.turrem.utils.geo.Ray;
-import net.turrem.utils.geo.Vector;
+import net.turrem.app.utils.geo.EnumDir;
+import net.turrem.app.utils.geo.Point;
+import net.turrem.app.utils.geo.Ray;
+import net.turrem.app.utils.geo.Vector;
 
 import org.lwjgl.input.Mouse;
 import org.lwjgl.util.glu.GLU;

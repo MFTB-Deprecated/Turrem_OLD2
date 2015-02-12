@@ -7,8 +7,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 
-import net.turrem.utils.JarExplore;
-
 public class JarLoader
 {
 	protected File theFile;

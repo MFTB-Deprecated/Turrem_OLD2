@@ -1,20 +1,18 @@
 package net.turrem.app.client.network.server;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
 import java.io.ByteArrayInputStream;
 import java.io.DataInput;
 import java.io.DataInputStream;
 import java.io.IOException;
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 import net.turrem.app.client.game.world.ClientWorld;
-import net.turrem.utils.CallList;
+import net.turrem.app.utils.CallList;
 
 public class ServerPacketManager
 {
