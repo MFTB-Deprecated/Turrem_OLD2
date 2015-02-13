@@ -1,6 +1,7 @@
 package net.turrem.app.client.game;
 
 import java.io.IOException;
+import java.util.Random;
 
 import net.turrem.app.client.Turrem;
 import net.turrem.app.client.asset.GameAsset;
@@ -16,6 +17,7 @@ public class RenderGame implements IScreenLayer
 {
 	public Timer timer = null;
 	public Font testFont;
+	public String testString = "";
 	
 	public RenderGame()
 	{
@@ -28,6 +30,12 @@ public class RenderGame implements IScreenLayer
 			e.printStackTrace();
 		}
 		this.testFont.load(Turrem.instance().theAssetLoader);
+		int[] chars = this.testFont.glyphs.keys();
+		Random rand = new Random();
+		for (int i = 0; i < 40; i++)
+		{
+			this.testString += (char) chars[rand.nextInt(chars.length)];
+		}
 	}
 	
 	@Override
@@ -68,7 +76,8 @@ public class RenderGame implements IScreenLayer
 		GL11.glVertex2f(100, 200);
 		GL11.glEnd();
 		GL11.glColor3f(0.0F, 0.0F, 0.0F);
-		this.testFont.renderSegment("This is a test!", 2.0F, 100, 0, true);
+		this.testFont.renderSegment("This is a test!", 50.0F, 50, 50, true);
+		this.testFont.renderSegment(this.testString, 32.0F, 50, 300, true);
 	}
 	
 	@Override

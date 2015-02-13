@@ -28,27 +28,21 @@ public class Glyph
 		this.page = page;
 	}
 	
-	public void render(float x, float y, float scale)
+	public void render(float x, float y)
 	{
-		float ux = this.glyphx & 0xFF;
-		float uy = this.glyphy & 0xFF;
-		float uw = this.width & 0xFF;
-		float uh = this.height & 0xFF;
-		float w = uw * scale;
-		float h = uh * scale;
-		x += this.xoffset * scale;
-		//y += this.yoffset * scale;
-		ux /= 256.0F;
-		uy /= 256.0F;
-		uw /= 256.0F;
-		uh /= 256.0F;
-		GL11.glTexCoord2f(ux, uy);
-		GL11.glVertex2f(x, y + h);
-		GL11.glTexCoord2f(ux + uw, uy);
-		GL11.glVertex2f(x + w, y + h);
-		GL11.glTexCoord2f(ux + uw, uy + uh);
+		float tx = (this.glyphx & 0xFF) / 256.0F;
+		float ty = (this.glyphy & 0xFF) / 256.0F;
+		float w = (this.width & 0xFF) / 256.0F;
+		float h = (this.height & 0xFF) / 256.0F;
+		x += this.xoffset / 256.0F;
+		y -= this.yoffset / 256.0F;
+		GL11.glTexCoord2f(tx, ty + h);
+		GL11.glVertex2f(x, y - h);
+		GL11.glTexCoord2f(tx + w, ty + h);
+		GL11.glVertex2f(x + w, y - h);
+		GL11.glTexCoord2f(tx + w, ty);
 		GL11.glVertex2f(x + w, y);
-		GL11.glTexCoord2f(ux, uy + uh);
+		GL11.glTexCoord2f(tx, ty);
 		GL11.glVertex2f(x, y);
 	}
 }

@@ -17,7 +17,7 @@ import org.lwjgl.opengl.GL13;
 
 public class Font
 {
-	final TIntObjectHashMap<Glyph> glyphs = new TIntObjectHashMap<>();
+	public final TIntObjectHashMap<Glyph> glyphs = new TIntObjectHashMap<>();
 	public final int size;
 	public final int lineHeight;
 	private int[] textures;
@@ -147,18 +147,25 @@ public class Font
 		return text.length();
 	}
 	
-	public void renderSegment(final String text, final float scale, float x, float y, final boolean kerning)
+	public void renderSegment(final String text, final float size, float xpos, float ypos, final boolean kerning)
 	{
+		float scale = size / (this.size / 256.0F);
 		int texture = -1;
 		OfInt codes = text.chars().iterator();
 		Glyph prev = null;
 		boolean started = false;
+		float x = 0;
+		float y = 0;
+		GL11.glPushMatrix();
+		GL11.glTranslatef(xpos, ypos, 0);
+		GL11.glScalef(scale, scale, 1);
+		int switchCount = 0;
 		while (codes.hasNext())
 		{
 			int code = codes.next();
 			if (kerning && prev != null)
 			{
-				x += prev.kerning.get(code) * scale;
+				x += prev.kerning.get(code) / 256.0F;
 			}
 			Glyph g = this.getGlyph(code);
 			if (g != null)
@@ -171,11 +178,12 @@ public class Font
 						GL11.glEnd();
 					}
 					this.bindTexture(this.textures[g.page & 0xFF]);
+					switchCount++;
 					GL11.glBegin(GL11.GL_QUADS);
 					started = true;
 				}
-				g.render(x, y, scale);
-				x += g.xadvance * scale;
+				g.render(x, y);
+				x += g.xadvance / 256.0F;
 				prev = g;
 			}
 		}
@@ -183,8 +191,10 @@ public class Font
 		{
 			GL11.glEnd();
 		}
+		System.out.printf("String \"%s\" was drawn with %d texture binds.%n", text, switchCount);
 		GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
 		GL11.glDisable(GL11.GL_BLEND);
+		GL11.glPopMatrix();
 	}
 	
 	private void bindTexture(int id)
