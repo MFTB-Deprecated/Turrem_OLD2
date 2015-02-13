@@ -10,8 +10,8 @@ allprojects
 	}
 }
 
-File bin = file("/bin/")
-File libDir = file("$bin/libs/")
+File bin = file("$buildDir/turrem/")
+File run = file("/bin/")
 
 def commonLibs = []
 def clientLibs = []
@@ -25,11 +25,16 @@ commonLibs << 'net.sf.trove4j:trove4j:3.0.3'
 commonLibs << 'org.apache.logging.log4j:log4j:2.1'
 commonLibs << 'org.apache.commons:commons-io:1.3.2'
 
+task cleanBin(type: Delete) {
+	delete bin
+}
+
 def platforms = ['windows', 'linux', 'osx']
 platforms.each 
 { 
 	platform -> task "${platform}Natives" {
-        def outputDir = "$libDir/natives/$platform"
+		dependsOn cleanBin
+        def outputDir = "$bin/libs/native/$platform"
         inputs.files(configurations.compile)
         outputs.dir(outputDir)
         doLast 
@@ -49,12 +54,13 @@ platforms.each
 }
 
 task natives {
-    description "Moves natives into the lib/natives/ directory"
+    description "Moves natives into the lib/native/ directory"
     dependsOn platforms.collect { "${it}Natives" }.findAll { tasks[it] }
 }
 
-task libJars {
+task makeLibs {
 	description "Moves library jars into the lib/ directory"
+	dependsOn cleanBin
 	dependsOn natives
     doLast 
 	{
@@ -66,22 +72,72 @@ task libJars {
 				from file.getParent()
 				include file.getName()
 			}
-			into libDir
+			into "$bin/libs/"
 		}
 	}
 }
 
 task appAssets(type: Copy) {
+	dependsOn cleanBin
 	from 'app/assets/'
 	into "$bin/assets/"
 }
 
-task assets {
-	dependsOn appAssets
+task appClient(type: Jar) {
+	baseName = 'app-client'
+	from project(":app:client").sourceSets.main.output
+	from project(":app:common").sourceSets.main.output
+}
+
+task makeApp(type: Copy) {
+	dependsOn appAssets, appClient
+	from file(appClient.archivePath).getParent()
+	include file(appClient.archivePath).getName()
+	rename 'app-(.+)-(.*)\\.jar', '$1.jar'
+	into "$bin/jars/" 
+}
+
+task coremodAssets(type: Copy) {
+	dependsOn cleanBin
+	from 'coremod/assets/'
+	into "$bin/mods/core/assets/"
+}
+
+task makeCoremod {
+	dependsOn coremodAssets
+}
+
+task modAssets(type: Copy) {
+	dependsOn cleanBin
+	from 'mod/assets/'
+	into "$bin/mods/turrem/assets/"
+}
+
+task makeMod {
+	dependsOn modAssets
 }
 
 task makeBin {
-	dependsOn assets, libJars
+	dependsOn makeApp, makeCoremod, makeMod, makeLibs
+}
+
+task binZip(type: Zip) {
+	dependsOn makeBin
+	from bin
+	include "libs/**"
+	include "jars/**"
+	include "assets/**"
+}
+
+artifacts
+{
+	archives (binZip.archivePath)
+}
+
+task install(type: Copy) {
+	dependsOn binZip
+	from zipTree(binZip.archivePath)
+	into run
 }
 
 dependencies
@@ -120,16 +176,16 @@ configure(subprojects)
 		
 		dependencies
 		{
-			runtime commonLibs
+			compile commonLibs
 			if (isClient)
 			{
 				compile project(":$partname:common")
-				runtime clientLibs
+				compile clientLibs
 			}
 			if (isServer)
 			{
 				compile project(":$partname:common")
-				runtime clientLibs
+				compile clientLibs
 			}
 		}
 	}

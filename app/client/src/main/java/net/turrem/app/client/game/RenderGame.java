@@ -1,5 +1,10 @@
 package net.turrem.app.client.game;
 
+import java.io.IOException;
+
+import net.turrem.app.client.Turrem;
+import net.turrem.app.client.asset.GameAsset;
+import net.turrem.app.client.font.Font;
 import net.turrem.app.client.render.IScreenLayer;
 import net.turrem.app.client.render.RenderEngine;
 import net.turrem.app.client.render.fbo.DiffuseFBO;
@@ -10,10 +15,19 @@ import org.lwjgl.util.glu.GLU;
 public class RenderGame implements IScreenLayer
 {
 	public Timer timer = null;
+	public Font testFont;
 	
 	public RenderGame()
 	{
-		
+		try
+		{
+			this.testFont = Font.loadFont(GameAsset.fromRaw("fonts/Arial.fnt"));
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+		this.testFont.load(Turrem.instance().theAssetLoader);
 	}
 	
 	@Override
@@ -41,7 +55,11 @@ public class RenderGame implements IScreenLayer
 	
 	public void renderGame(float partial, RenderEngine engine, DiffuseFBO target)
 	{
+		GL11.glMatrixMode(GL11.GL_PROJECTION);
+		GL11.glLoadIdentity();
 		GLU.gluOrtho2D(0, target.width, 0, target.height);
+		GL11.glMatrixMode(GL11.GL_MODELVIEW);
+		GL11.glLoadIdentity();
 		GL11.glColor3f(0.2F, 0.2F, 1.0F);
 		GL11.glBegin(GL11.GL_QUADS);
 		GL11.glVertex2f(100, 100);
@@ -49,6 +67,8 @@ public class RenderGame implements IScreenLayer
 		GL11.glVertex2f(200, 200);
 		GL11.glVertex2f(100, 200);
 		GL11.glEnd();
+		GL11.glColor3f(0.0F, 0.0F, 0.0F);
+		this.testFont.renderSegment("This is a test!", 2.0F, 100, 0, true);
 	}
 	
 	@Override

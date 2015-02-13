@@ -96,6 +96,8 @@ public class Turrem
 		while (!this.closeRequested())
 		{
 			screen.render();
+			Display.update();
+			Display.sync(60);
 		}
 	}
 	

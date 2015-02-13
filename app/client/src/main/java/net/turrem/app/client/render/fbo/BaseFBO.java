@@ -88,6 +88,7 @@ public abstract class BaseFBO
 	
 	public void bind()
 	{
+		GL11.glViewport(0, 0, this.width, this.height);
 		this.fbo.bind();
 	}
 	
@@ -111,6 +112,7 @@ public abstract class BaseFBO
 		}
 		GL11.glLoadIdentity();
 		GL11.glBegin(GL11.GL_QUADS);
+		GL11.glColor3f(1.0F, 1.0F, 1.0F);
 		GL11.glTexCoord2f(0, 0);
 		GL11.glVertex2f(-1, -1);
 		GL11.glTexCoord2f(1, 0);

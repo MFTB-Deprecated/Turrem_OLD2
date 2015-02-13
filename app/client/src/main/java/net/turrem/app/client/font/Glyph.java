@@ -30,21 +30,25 @@ public class Glyph
 	
 	public void render(float x, float y, float scale)
 	{
-		int ux = this.glyphx & 0xFF;
-		int uy = this.glyphx & 0xFF;
-		int uw = this.width & 0xFF;
-		int uh = this.height & 0xFF;
+		float ux = this.glyphx & 0xFF;
+		float uy = this.glyphy & 0xFF;
+		float uw = this.width & 0xFF;
+		float uh = this.height & 0xFF;
 		float w = uw * scale;
 		float h = uh * scale;
 		x += this.xoffset * scale;
-		y += this.yoffset * scale;
+		//y += this.yoffset * scale;
+		ux /= 256.0F;
+		uy /= 256.0F;
+		uw /= 256.0F;
+		uh /= 256.0F;
 		GL11.glTexCoord2f(ux, uy);
-		GL11.glVertex2f(x, y);
-		GL11.glTexCoord2f(ux + uw, uy);
-		GL11.glVertex2f(x + w, y);
-		GL11.glTexCoord2f(ux + uw, uy + uh);
-		GL11.glVertex2f(x + w, y + h);
-		GL11.glTexCoord2f(ux, uy + uh);
 		GL11.glVertex2f(x, y + h);
+		GL11.glTexCoord2f(ux + uw, uy);
+		GL11.glVertex2f(x + w, y + h);
+		GL11.glTexCoord2f(ux + uw, uy + uh);
+		GL11.glVertex2f(x + w, y);
+		GL11.glTexCoord2f(ux, uy + uh);
+		GL11.glVertex2f(x, y);
 	}
 }

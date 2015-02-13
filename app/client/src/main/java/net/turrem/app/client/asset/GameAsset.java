@@ -49,6 +49,10 @@ public class GameAsset
 		this.mod = mod == null ? Mod.APP : mod;
 		this.isModApp = Mod.APP.equals(this.mod);
 		this.file = file.replaceAll("\\\\", "/");
+		if (!file.startsWith("/"))
+		{
+			file = "/" + file;
+		}
 		this.location = location;
 	}
 	
@@ -98,6 +102,33 @@ public class GameAsset
 			dir = new File(dir, this.file);
 		}
 		return dir;
+	}
+	
+	public GameAsset getParent()
+	{
+		String pfile = this.file;
+		EnumAssetLocation ploc = this.location;
+		if (this.isDirectory())
+		{
+			pfile = pfile.substring(0, pfile.length() - 1);
+		}
+		int split = this.file.lastIndexOf('/');
+		if (split == -1)
+		{
+			if (this.location == EnumAssetLocation.ASSETS)
+			{
+				ploc = EnumAssetLocation.BIN;
+			}
+			else
+			{
+				return null;
+			}
+		}
+		else
+		{
+			pfile = pfile.substring(0, split + 1);
+		}
+		return new GameAsset(this.mod, pfile, ploc);
 	}
 	
 	public GameAsset[] getAssets()

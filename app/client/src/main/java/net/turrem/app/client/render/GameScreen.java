@@ -28,6 +28,7 @@ public class GameScreen
 	
 	public GameScreen(RenderEngine engine)
 	{
+		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		this.engine = engine;
 		this.layers = new EnumMap<>(EnumScreenLayers.class);
 		this.target = new DiffuseFBO(Turrem.width(), Turrem.height());
@@ -50,6 +51,7 @@ public class GameScreen
 			if (layer != null)
 			{
 				this.target.bind();
+				GL11.glClearColor(1, 1, 1, 1);
 				GL11.glClear(GL11.GL_COLOR_BUFFER_BIT);
 				layer.render(this.engine, this.target);
 				this.target.unbind();

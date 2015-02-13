@@ -1,0 +1,5 @@
+task appClient(type: Jar) {
+	baseName = 'app-client'
+	from project(":app:client").sourceSets.main.output
+	from project(":app:common").sourceSets.main.output
+}
