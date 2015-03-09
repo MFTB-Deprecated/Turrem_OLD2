@@ -2,6 +2,8 @@ package net.turrem.app.client.game;
 
 import java.io.IOException;
 
+import org.lwjgl.util.vector.Matrix4f;
+
 import net.turrem.app.client.Turrem;
 import net.turrem.app.client.game.world.ClientWorld;
 import net.turrem.app.client.game.world.data.ClientWorldData;
@@ -63,6 +65,11 @@ public class ClientGame
 		{
 			this.theTurrem.onCrash(error);
 		}
+	}
+	
+	public void drawGameGeometry(Matrix4f modelMatrix, Runnable onMatrixChange)
+	{
+		
 	}
 	
 	public void runLoop()

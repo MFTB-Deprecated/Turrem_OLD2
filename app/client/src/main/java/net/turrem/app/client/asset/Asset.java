@@ -10,6 +10,12 @@ public class Asset extends FeatureName
 		super(mod, identifier);
 	}
 	
+	@Override
+	public boolean equals(Object obj)
+	{
+		return obj instanceof Asset && super.equals(obj);
+	}
+	
 	public GameAsset getAsset(String extension)
 	{
 		return new GameAsset(this.mod, this.identifier.replaceAll("\\.", "/") + "." + extension, GameAsset.EnumAssetLocation.ASSETS);

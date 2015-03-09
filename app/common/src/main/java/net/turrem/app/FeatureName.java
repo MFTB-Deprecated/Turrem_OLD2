@@ -28,6 +28,23 @@ public class FeatureName
 		return this.getRaw();
 	}
 	
+	@Override
+	public int hashCode()
+	{
+		return this.mod.hashCode() ^ this.identifier.hashCode();
+	}
+	
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (obj instanceof FeatureName)
+		{
+			FeatureName fn = (FeatureName) obj;
+			return this.mod.equals(fn.mod) && this.identifier.equals(fn.identifier);
+		}
+		return false;
+	}
+	
 	public static FeatureName fromRaw(String raw)
 	{
 		int split = raw.indexOf(':');

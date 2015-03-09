@@ -7,9 +7,12 @@ import java.lang.reflect.Method;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
-import net.turrem.app.utils.graphics.GLUtils;
+import org.lwjgl.BufferUtils;
+
+import net.turrem.app.client.utils.graphics.GLUtils;
 
 import org.lwjgl.opengl.GL20;
+
 import org.lwjgl.util.vector.Matrix;
 import org.lwjgl.util.vector.Matrix2f;
 import org.lwjgl.util.vector.Matrix3f;
@@ -32,17 +35,17 @@ public class ShaderUniform
 		UNIFORM_2I("glUniform2i", int.class, int.class),
 		UNIFORM_3I("glUniform3i", int.class, int.class, int.class),
 		UNIFORM_4I("glUniform4i", int.class, int.class, int.class, int.class),
-		UNIFORM_1FV("glUniform1fv", int.class, FloatBuffer.class),
-		UNIFORM_2FV("glUniform2fv", int.class, FloatBuffer.class),
-		UNIFORM_3FV("glUniform3fv", int.class, FloatBuffer.class),
-		UNIFORM_4FV("glUniform4fv", int.class, FloatBuffer.class),
-		UNIFORM_1IV("glUniform1iv", int.class, IntBuffer.class),
-		UNIFORM_2IV("glUniform2iv", int.class, IntBuffer.class),
-		UNIFORM_3IV("glUniform3iv", int.class, IntBuffer.class),
-		UNIFORM_4IV("glUniform4iv", int.class, IntBuffer.class),
-		UNIFORM_MATRIX_2FV("glUniformMatrix2fv", int.class, boolean.class, FloatBuffer.class),
-		UNIFORM_MATRIX_3FV("glUniformMatrix3fv", int.class, boolean.class, FloatBuffer.class),
-		UNIFORM_MATRIX_4FV("glUniformMatrix4fv", int.class, boolean.class, FloatBuffer.class);
+		UNIFORM_1FV("glUniform1", FloatBuffer.class),
+		UNIFORM_2FV("glUniform2", FloatBuffer.class),
+		UNIFORM_3FV("glUniform3", FloatBuffer.class),
+		UNIFORM_4FV("glUniform4", FloatBuffer.class),
+		UNIFORM_1IV("glUniform1", IntBuffer.class),
+		UNIFORM_2IV("glUniform2", IntBuffer.class),
+		UNIFORM_3IV("glUniform3", IntBuffer.class),
+		UNIFORM_4IV("glUniform4", IntBuffer.class),
+		UNIFORM_MATRIX_2FV("glUniformMatrix2", boolean.class, FloatBuffer.class),
+		UNIFORM_MATRIX_3FV("glUniformMatrix3", boolean.class, FloatBuffer.class),
+		UNIFORM_MATRIX_4FV("glUniformMatrix4", boolean.class, FloatBuffer.class);
 		
 		public final Method call;
 		
@@ -77,9 +80,20 @@ public class ShaderUniform
 	private Method call = null;
 	private Object[] data = null;
 	
+	public ShaderUniform()
+	{
+		this("");
+	}
+	
 	public ShaderUniform(String name)
 	{
 		this.name = name;
+	}
+	
+	public boolean upload(Program program, String name)
+	{
+		this.name = name;
+		return this.upload(program);
 	}
 	
 	public boolean upload(Program program)
@@ -96,6 +110,13 @@ public class ShaderUniform
 		int loc = GL20.glGetUniformLocation(pid, this.name);
 		if (loc == -1)
 		{
+			
+			System.err.printf("Could not find uniform: %s%n", this.name);
+			StackTraceElement[] trace = Thread.currentThread().getStackTrace();
+			for (int i = 1; i < trace.length; i++)
+			{
+				System.err.println(trace[i]);
+			}
 			return false;
 		}
 		Object[] pars = new Object[this.data.length + 1];
@@ -110,6 +131,8 @@ public class ShaderUniform
 		}
 		catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e)
 		{
+			System.err.printf("Could not call %s with uniform (%s), it threw a:%n", this.call.getName(), this.name);
+			e.printStackTrace(System.err);
 			return false;
 		}
 		return true;
@@ -155,15 +178,15 @@ public class ShaderUniform
 				return;
 			default:
 				this.call = EnumUniformCalls.UNIFORM_1IV.call;
-				this.data = new Object[] { value.length, GLUtils.bufferInts(value) };
+				this.data = new Object[] { GLUtils.bufferInts(value) };
 				return;
 		}
 	}
 	
-	public void setInts(int size, IntBuffer buf)
+	public void setInts(IntBuffer buf)
 	{
 		this.call = EnumUniformCalls.UNIFORM_1IV.call;
-		this.data = new Object[] { size, buf };
+		this.data = new Object[] { buf };
 	}
 	
 	public void setFloats(float... value)
@@ -188,15 +211,15 @@ public class ShaderUniform
 				return;
 			default:
 				this.call = EnumUniformCalls.UNIFORM_1FV.call;
-				this.data = new Object[] { value.length, GLUtils.bufferFloats(value) };
+				this.data = new Object[] { GLUtils.bufferFloats(value) };
 				return;
 		}
 	}
 	
-	public void setFloats(int size, FloatBuffer buf)
+	public void setFloats(FloatBuffer buf)
 	{
 		this.call = EnumUniformCalls.UNIFORM_1FV.call;
-		this.data = new Object[] { size, buf };
+		this.data = new Object[] { buf };
 	}
 	
 	public void setVector(Vector value)
@@ -221,13 +244,13 @@ public class ShaderUniform
 	
 	private void setVectors(int size, Vector... value)
 	{
-		FloatBuffer buf = FloatBuffer.allocate(size * value.length);
+		FloatBuffer buf = BufferUtils.createFloatBuffer(size * value.length);
 		for (int i = 0; i < value.length; i++)
 		{
 			value[i].store(buf);
 		}
 		buf.flip();
-		this.data = new Object[] { value.length, buf };
+		this.data = new Object[] { buf };
 	}
 	
 	public void setVectors(Vector2f... value)
@@ -277,7 +300,7 @@ public class ShaderUniform
 			default:
 				throw new IllegalArgumentException("Size must be less than or equal to 4 and at least 1.");
 		}
-		this.data = new Object[] { data.length / size, GLUtils.bufferFloats(data) };
+		this.data = new Object[] { GLUtils.bufferFloats(data) };
 	}
 	
 	public void setInts(int size, int[] data)
@@ -303,7 +326,7 @@ public class ShaderUniform
 			default:
 				throw new IllegalArgumentException("Size must be less than or equal to 4 and at least 1.");
 		}
-		this.data = new Object[] { data.length / size, GLUtils.bufferInts(data) };
+		this.data = new Object[] { GLUtils.bufferInts(data) };
 	}
 	
 	public void setMatrix(Matrix value)
@@ -329,13 +352,13 @@ public class ShaderUniform
 	
 	private void setMatricies(int size, boolean transpose, Matrix... value)
 	{
-		FloatBuffer buf = FloatBuffer.allocate(size * size * value.length);
+		FloatBuffer buf = BufferUtils.createFloatBuffer(size * size * value.length);
 		for (int i = 0; i < value.length; i++)
 		{
 			value[i].store(buf);
 		}
 		buf.flip();
-		this.data = new Object[] { value.length, transpose, buf };
+		this.data = new Object[] { transpose, buf };
 	}
 	
 	public void setMatricies(Matrix2f... value)
@@ -378,7 +401,7 @@ public class ShaderUniform
 	
 	public void setColorsRGB(Color... value)
 	{
-		FloatBuffer buf = FloatBuffer.allocate(3 * value.length);
+		FloatBuffer buf = BufferUtils.createFloatBuffer(3 * value.length);
 		float[] comps = new float[3];
 		for (int i = 0; i < value.length; i++)
 		{
@@ -387,7 +410,7 @@ public class ShaderUniform
 		}
 		buf.flip();
 		this.call = EnumUniformCalls.UNIFORM_3FV.call;
-		this.data = new Object[] { value.length, buf };
+		this.data = new Object[] { buf };
 	}
 	
 	public void setColorRGBA(Color value)
@@ -397,7 +420,7 @@ public class ShaderUniform
 	
 	public void setColorsRGBA(Color... value)
 	{
-		FloatBuffer buf = FloatBuffer.allocate(4 * value.length);
+		FloatBuffer buf = BufferUtils.createFloatBuffer(4 * value.length);
 		float[] comps = new float[4];
 		for (int i = 0; i < value.length; i++)
 		{
@@ -406,7 +429,7 @@ public class ShaderUniform
 		}
 		buf.flip();
 		this.call = EnumUniformCalls.UNIFORM_4FV.call;
-		this.data = new Object[] { value.length, buf };
+		this.data = new Object[] { buf };
 	}
 	
 	private Object[] getArray(Object val)

@@ -10,7 +10,7 @@ import java.util.PrimitiveIterator.OfInt;
 import net.turrem.app.client.asset.AssetLoader;
 import net.turrem.app.client.asset.GameAsset;
 import net.turrem.app.client.font.bmf.BMFFile;
-import net.turrem.app.utils.graphics.ImgUtils;
+import net.turrem.app.client.utils.graphics.ImgUtils;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;

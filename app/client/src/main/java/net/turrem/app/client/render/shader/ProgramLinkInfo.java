@@ -1,16 +1,15 @@
 package net.turrem.app.client.render.shader;
 
-public class ShaderAttachInfo
+public class ProgramLinkInfo
 {
 	public static enum Error
 	{
 		NONE,
 		PROGRAM_NOT_CREATED,
-		SHADER_NOT_CREATED,
 		LINK_ERROR;
 	}
 	
-	public ShaderAttachInfo(Error state, String log)
+	public ProgramLinkInfo(Error state, String log)
 	{
 		this.state = state;
 		this.log = log;

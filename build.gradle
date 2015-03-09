@@ -2,11 +2,15 @@ allprojects
 {
     apply plugin: 'java'
     group = 'net.turrem'
-    version = '1.0'
+    version = '0.3.0'
 	
 	repositories 
 	{
 		mavenCentral()
+		maven
+		{
+			url "http://maven.geotoolkit.org/"
+		}
 	}
 }
 
@@ -24,6 +28,7 @@ clientLibs << 'org.lwjgl.lwjgl:lwjgl_util:2.9.1'
 commonLibs << 'net.sf.trove4j:trove4j:3.0.3'
 commonLibs << 'org.apache.logging.log4j:log4j:2.1'
 commonLibs << 'org.apache.commons:commons-io:1.3.2'
+commonLibs << 'java3d:vecmath:1.5.2'
 
 task cleanBin(type: Delete) {
 	delete bin

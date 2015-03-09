@@ -2,6 +2,7 @@ package net.turrem.app.client.render.shader;
 
 import net.turrem.app.client.render.fbo.EnumDrawBufferLocs;
 
+import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 
@@ -27,6 +28,22 @@ public class Program
 			}
 			this.created = true;
 		}
+	}
+	
+	public ProgramLinkInfo link()
+	{
+		if (!this.created)
+		{
+			return new ProgramLinkInfo(ProgramLinkInfo.Error.PROGRAM_NOT_CREATED, null);
+		}
+		GL20.glLinkProgram(this.program);
+		if (GL20.glGetProgrami(this.program, GL20.GL_LINK_STATUS) == GL11.GL_FALSE)
+		{
+			int loglength = GL20.glGetProgrami(this.program, GL20.GL_INFO_LOG_LENGTH);
+			String log = GL20.glGetProgramInfoLog(this.program, loglength);
+			return new ProgramLinkInfo(ProgramLinkInfo.Error.LINK_ERROR, log);
+		}
+		return new ProgramLinkInfo(ProgramLinkInfo.Error.NONE, null);
 	}
 	
 	public void delete()

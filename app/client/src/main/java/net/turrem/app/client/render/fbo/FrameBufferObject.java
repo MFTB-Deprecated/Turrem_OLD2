@@ -43,11 +43,11 @@ class FrameBufferObject
 		this.created = false;
 	}
 	
-	public int create()
+	public void create()
 	{
 		if (this.created)
 		{
-			return this.buffer;
+			return;
 		}
 		for (int i = 0; i < this.textures.length; i++)
 		{
@@ -55,7 +55,6 @@ class FrameBufferObject
 		}
 		this.buffer = GL30.glGenFramebuffers();
 		this.created = true;
-		return this.buffer;
 	}
 	
 	public int getBuffer()

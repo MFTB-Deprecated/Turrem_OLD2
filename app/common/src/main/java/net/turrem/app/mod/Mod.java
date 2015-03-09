@@ -7,7 +7,7 @@ public class Mod
 	
 	public final String identifier;
 	public final String version;
-	public final int hash;
+	private final int hash;
 	
 	public Mod(String id)
 	{

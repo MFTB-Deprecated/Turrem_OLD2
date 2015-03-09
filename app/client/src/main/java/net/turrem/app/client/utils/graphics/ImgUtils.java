@@ -1,4 +1,4 @@
-package net.turrem.app.utils.graphics;
+package net.turrem.app.client.utils.graphics;
 
 import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;

@@ -8,19 +8,22 @@ import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 
+import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.DisplayMode;
+
+import org.lwjgl.LWJGLException;
+import org.lwjgl.input.Keyboard;
+
 import net.turrem.app.EnumSide;
 import net.turrem.app.Global;
 import net.turrem.app.client.asset.AssetLoader;
 import net.turrem.app.client.asset.GameAsset;
-import net.turrem.app.client.render.GameScreen;
+import net.turrem.app.client.render.IntroScreen;
 import net.turrem.app.client.render.RenderEngine;
+import net.turrem.app.client.render.RenderScreen;
+import net.turrem.app.client.render.fbo.DiffuseFBO;
+import net.turrem.app.client.utils.graphics.ImgUtils;
 import net.turrem.app.mod.ModLoader;
-import net.turrem.app.utils.graphics.ImgUtils;
-
-import org.lwjgl.LWJGLException;
-import org.lwjgl.input.Keyboard;
-import org.lwjgl.opengl.Display;
-import org.lwjgl.opengl.DisplayMode;
 
 public class Turrem
 {
@@ -36,6 +39,9 @@ public class Turrem
 	public ModLoader modLoader;
 	
 	public RenderEngine engine;
+	
+	private RenderScreen screen = null;
+	private RenderScreen newScreen = null;
 	
 	public Turrem(Session session, String dir)
 	{
@@ -64,6 +70,11 @@ public class Turrem
 		return height;
 	}
 	
+	public static float aspect()
+	{
+		return (float) width / height;
+	}
+	
 	protected void run()
 	{
 		this.modLoader = new ModLoader(new File(this.theGameDir, "mods"), EnumSide.CLIENT, this.getClass().getClassLoader());
@@ -89,15 +100,23 @@ public class Turrem
 			e.printStackTrace();
 		}
 		
-		this.engine = new RenderEngine();
+		this.engine = RenderEngine.instance;
 		
-		GameScreen screen = new GameScreen(this.engine);
+		DiffuseFBO target = new DiffuseFBO(Turrem.width, Turrem.height);
+		
+		this.screen = new IntroScreen(target);
 		
 		while (!this.closeRequested())
 		{
-			screen.render();
+			this.screen.render();
 			Display.update();
 			Display.sync(60);
+			if (this.newScreen != null)
+			{
+				this.screen.end();
+				this.screen = this.newScreen;
+				this.newScreen = null;
+			}
 		}
 	}
 	
@@ -116,6 +135,11 @@ public class Turrem
 	{
 		Display.destroy();
 		System.exit(0);
+	}
+	
+	public void changeScreen(RenderScreen newScreen)
+	{
+		this.newScreen = newScreen;
 	}
 	
 	public void setIcons() throws IOException
